@@ -1,215 +1,266 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Multi Targets</title>
-    
-    <!-- Bibliotecas -->
-    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    
-    <style>
-        body { margin: 0; overflow: hidden; }
-        
-        /* Botão de áudio */
-        .audio-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            z-index: 9999;
-            cursor: pointer;
-            border: 2px solid white;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .playing { background: rgba(0,128,0,0.8); }
-        .paused { background: rgba(255,0,0,0.8); }
-        
-        /* Loading */
-        #loading {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            background: rgba(0,0,0,0.7);
-            padding: 20px;
-            border-radius: 10px;
-            z-index: 10000;
-        }
-    </style>
+   <script>
+const VERSION = "1.0.0"; 
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+<style>
+body { margin:0; overflow:hidden; }
+.audio-control-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  z-index: 9999;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+.audio-control-btn.playing { background-color: rgba(0, 128, 0, 0.8); }
+.audio-control-btn.paused { background-color: rgba(255, 0, 0, 0.8); }
+.audio-control-btn:hover { transform: scale(1.1); }
+.a-enter-vr {
+  position: fixed;
+  bottom: 20px !important;
+  right: 20px !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+}
+</style>
 </head>
+
 <body>
 
-    <!-- Loading -->
-    <div id="loading">📱 Inicializando AR...</div>
+<a-scene
+  mindar-image="imageTargetSrc: Target01.mind;"  <!-- USANDO Target01.mind -->
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: false">
 
-    <!-- Botão de áudio -->
-    <button class="audio-btn paused" id="audioBtn">🔇</button>
+  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <a-scene
-        mindar-image="imageTargetSrc: Target01.mind; autoStart: true;"
-        vr-mode-ui="enabled: false"
-        device-orientation-permission-ui="enabled: false"
-        embedded
-        color-space="sRGB"
-        renderer="colorManagement: true;"
-        background="color: black">
+  <!-- ========================================= -->
+  <!-- TARGET 0 - Modelo 3D (primeira imagem)    -->
+  <!-- ========================================= -->
+  <a-entity mindar-image-target="targetIndex: 0" id="target-modelo">
 
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <!-- MODELO 3D -->
+    <a-entity
+      id="mascote"
+      gltf-model="MascoteDanca.glb"
+      animation-mixer
+      position="0 0 0.3"
+      rotation="-90 0 0"
+      scale="0.7 0.7 0.7">
+    </a-entity>
 
-        <!-- TARGET 0 -->
-        <a-entity mindar-image-target="targetIndex: 0">
-            <!-- Modelo 3D -->
-            <a-entity
-                gltf-model="BonnyCaminha.glb"
-                animation-mixer
-                position="0 0 0.3"
-                rotation="-90 0 0"
-                scale="0.7 0.7 0.7">
-            </a-entity>
-            
-            <!-- Áudio -->
-            <a-entity
-                id="audio0"
-                sound="src: Moo.mp3; autoplay: false; loop: true; positional: false;">
-            </a-entity>
-        </a-entity>
+  </a-entity>
 
-        <!-- TARGET 1 -->
-        <a-entity mindar-image-target="targetIndex: 1">
-            <a-entity
-                gltf-model="Cena 01Teste.glb"
-                animation-mixer
-                position="0 0 0.3"
-                rotation="-90 0 0"
-                scale="0.7 0.7 0.7">
-            </a-entity>
-            
-            <a-entity
-                id="audio1"
-                sound="src: Passaros.mp3; autoplay: false; loop: true; positional: false;">
-            </a-entity>
-        </a-entity>
+  <!-- ========================================= -->
+  <!-- TARGET 1 - VÍDEO (segunda imagem)         -->
+  <!-- ========================================= -->
+  <a-entity mindar-image-target="targetIndex: 1" id="target-video">
 
-        <!-- TARGET 2 -->
-        <a-entity mindar-image-target="targetIndex: 2">
-            <a-entity
-                gltf-model="MascoteDanca.glb"
-                animation-mixer
-                position="0 0 0.3"
-                rotation="-90 0 0"
-                scale="0.7 0.7 0.7">
-            </a-entity>
-            
-            <a-entity
-                id="audio2"
-                sound="src: Chuva02.mp3; autoplay: false; loop: true; positional: false;">
-            </a-entity>
-        </a-entity>
+    <!-- TELA DE VÍDEO -->
+    <a-entity
+      id="tela-video"
+      geometry="primitive: plane; width: 1; height: 0.56"
+      material="shader: flat; src: #meuVideo; transparent: true;"
+      position="0 0 0.3"
+      rotation="-90 0 0"
+      scale="0.7 0.7 0.7">
+    </a-entity>
 
-        <!-- TARGET 3 (vazio) -->
-        <a-entity mindar-image-target="targetIndex: 3"></a-entity>
+    <!-- VÍDEO (escondido) -->
+    <video id="meuVideo" preload="auto" loop style="display: none;" crossorigin="anonymous">
+      <source src="Video Antecipe Portugues 1.mp4" type="video/mp4">
+    </video>
 
-        <!-- TARGET 4 (vazio) -->
-        <a-entity mindar-image-target="targetIndex: 4"></a-entity>
+  </a-entity>
 
-        <!-- TARGET 5 (vazio) -->
-        <a-entity mindar-image-target="targetIndex: 5"></a-entity>
+  <!-- ÁUDIO do modelo -->
+  <audio id="audioMascote" preload="auto" style="display: none;" loop="false">
+    <source src="AudioTrack11.mp3" type="audio/mpeg">
+  </audio>
 
-    </a-scene>
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            
-            const loading = document.getElementById('loading');
-            const audioBtn = document.getElementById('audioBtn');
-            
-            // Lista de áudios
-            const audios = ['#audio0', '#audio1', '#audio2'];
-            let currentAudio = null;
-            
-            // Quando a cena carregar
-            const scene = document.querySelector('a-scene');
-            
-            scene.addEventListener('loaded', function() {
-                loading.innerHTML = '✅ Pronto! Aponte para os targets...';
-                setTimeout(() => loading.style.display = 'none', 2000);
-            });
+  // Elementos
+  const targetModelo = document.querySelector('#target-modelo');
+  const targetVideo = document.querySelector('#target-video');
+  const audioElement = document.querySelector('#audioMascote');
+  const videoElement = document.querySelector('#meuVideo');
+  
+  // Variáveis
+  let audioUnlocked = false;
+  let audioPausedTime = 0;
+  let isAudioPlaying = false;
+  let videoPausedTime = 0;
+  let isVideoPlaying = false;
+  let currentTarget = null;
+  
+  // Botão
+  const audioBtn = document.createElement('button');
+  audioBtn.id = 'audioControlBtn';
+  audioBtn.className = 'audio-control-btn paused';
+  audioBtn.innerHTML = '🔇';
+  document.body.appendChild(audioBtn);
 
-            // Detectar targets
-            const targets = document.querySelectorAll('[mindar-image-target]');
-            
-            targets.forEach((target, index) => {
-                target.addEventListener('targetFound', () => {
-                    console.log(`🎯 Target ${index} encontrado!`);
-                    loading.style.display = 'block';
-                    loading.innerHTML = `✅ Target ${index} encontrado!`;
-                    setTimeout(() => loading.style.display = 'none', 1000);
-                    
-                    // Parar áudio anterior
-                    if (currentAudio) {
-                        currentAudio.components.sound.stopSound();
-                    }
-                    
-                    // Tocar novo áudio
-                    if (index < audios.length) {
-                        const audio = document.querySelector(audios[index]);
-                        if (audio) {
-                            audio.components.sound.playSound();
-                            currentAudio = audio;
-                            audioBtn.classList.add('playing');
-                            audioBtn.classList.remove('paused');
-                            audioBtn.innerHTML = '🔊';
-                        }
-                    }
-                });
+  function updateButtonIcon() {
+    if (isAudioPlaying || isVideoPlaying) {
+      audioBtn.innerHTML = '🔊';
+      audioBtn.classList.add('playing');
+      audioBtn.classList.remove('paused');
+    } else {
+      audioBtn.innerHTML = '🔇';
+      audioBtn.classList.add('paused');
+      audioBtn.classList.remove('playing');
+    }
+  }
 
-                target.addEventListener('targetLost', () => {
-                    console.log(`🚫 Target ${index} perdido!`);
-                    
-                    if (currentAudio) {
-                        currentAudio.components.sound.stopSound();
-                        currentAudio = null;
-                        audioBtn.classList.remove('playing');
-                        audioBtn.classList.add('paused');
-                        audioBtn.innerHTML = '🔇';
-                    }
-                });
-            });
+  // ============================================
+  // TARGET 0 - MODELO
+  // ============================================
+  targetModelo.addEventListener("targetFound", () => {
+    console.log('TARGET 0 encontrado! (Modelo)');
+    currentTarget = 'modelo';
+    
+    // Pausa vídeo se estiver tocando
+    if (isVideoPlaying) {
+      videoPausedTime = videoElement.currentTime;
+      videoElement.pause();
+      isVideoPlaying = false;
+    }
+    
+    // Toca áudio do modelo
+    if (!audioUnlocked) {
+      audioElement.play()
+        .then(() => {
+          audioUnlocked = true;
+          isAudioPlaying = true;
+          updateButtonIcon();
+        })
+        .catch(() => {});
+    } else {
+      if (audioPausedTime > 0) audioElement.currentTime = audioPausedTime;
+      audioElement.play().then(() => {
+        isAudioPlaying = true;
+        updateButtonIcon();
+      });
+    }
+  });
 
-            // Botão de áudio manual
-            audioBtn.addEventListener('click', function() {
-                if (currentAudio) {
-                    currentAudio.components.sound.stopSound();
-                    currentAudio = null;
-                    audioBtn.classList.remove('playing');
-                    audioBtn.classList.add('paused');
-                    audioBtn.innerHTML = '🔇';
-                }
-            });
+  targetModelo.addEventListener("targetLost", () => {
+    console.log('TARGET 0 perdido!');
+    if (isAudioPlaying) {
+      audioPausedTime = audioElement.currentTime;
+      audioElement.pause();
+      isAudioPlaying = false;
+      updateButtonIcon();
+    }
+  });
 
-            // Desbloquear áudio no primeiro clique
-            document.body.addEventListener('click', function unlock() {
-                document.querySelectorAll('[sound]').forEach(el => {
-                    el.components.sound.playSound();
-                    el.components.sound.stopSound();
-                });
-                document.body.removeEventListener('click', unlock);
-            });
+  // ============================================
+  // TARGET 1 - VÍDEO
+  // ============================================
+  targetVideo.addEventListener("targetFound", () => {
+    console.log('TARGET 1 encontrado! (Vídeo)');
+    currentTarget = 'video';
+    
+    // Pausa áudio se estiver tocando
+    if (isAudioPlaying) {
+      audioPausedTime = audioElement.currentTime;
+      audioElement.pause();
+      isAudioPlaying = false;
+    }
+    
+    // Toca vídeo
+    if (!videoUnlocked) {
+      videoElement.play()
+        .then(() => {
+          videoUnlocked = true;
+          isVideoPlaying = true;
+          updateButtonIcon();
+        })
+        .catch(() => {});
+    } else {
+      if (videoPausedTime > 0) videoElement.currentTime = videoPausedTime;
+      videoElement.play().then(() => {
+        isVideoPlaying = true;
+        updateButtonIcon();
+      });
+    }
+  });
 
-            console.log('🚀 AR iniciado!');
-        });
-    </script>
+  targetVideo.addEventListener("targetLost", () => {
+    console.log('TARGET 1 perdido!');
+    if (isVideoPlaying) {
+      videoPausedTime = videoElement.currentTime;
+      videoElement.pause();
+      isVideoPlaying = false;
+      updateButtonIcon();
+    }
+  });
+
+  // Botão manual
+  audioBtn.addEventListener('click', function() {
+    if (isAudioPlaying) {
+      audioPausedTime = audioElement.currentTime;
+      audioElement.pause();
+      isAudioPlaying = false;
+    } else if (isVideoPlaying) {
+      videoPausedTime = videoElement.currentTime;
+      videoElement.pause();
+      isVideoPlaying = false;
+    } else {
+      if (currentTarget === 'modelo') {
+        if (audioPausedTime > 0) audioElement.currentTime = audioPausedTime;
+        audioElement.play().then(() => isAudioPlaying = true);
+      } else if (currentTarget === 'video') {
+        if (videoPausedTime > 0) videoElement.currentTime = videoPausedTime;
+        videoElement.play().then(() => isVideoPlaying = true);
+      }
+    }
+    updateButtonIcon();
+  });
+
+  // Monitorar tempos
+  setInterval(() => {
+    if (isAudioPlaying) audioPausedTime = audioElement.currentTime;
+    if (isVideoPlaying) videoPausedTime = videoElement.currentTime;
+  }, 1000);
+
+  // Desbloqueio
+  document.body.addEventListener('click', function unlock() {
+    audioElement.play().then(() => { audioElement.pause(); audioElement.currentTime = 0; }).catch(() => {});
+    videoElement.play().then(() => { videoElement.pause(); videoElement.currentTime = 0; }).catch(() => {});
+    document.body.removeEventListener('click', unlock);
+  });
+
+  audioElement.load();
+  videoElement.load();
+
+  console.log('✅ Sistema pronto!');
+  console.log('🎯 Target 0: Modelo 3D');
+  console.log('🎯 Target 1: Vídeo');
+
+});
+</script>
 
 </body>
 </html>
