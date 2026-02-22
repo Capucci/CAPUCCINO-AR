@@ -2,7 +2,7 @@
 <html>
 <head>
    <script>
-const VERSION = "6.0.0"; // Versão com 6 targets (cubo completo)
+const VERSION = "1.0.0"; 
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -12,8 +12,6 @@ const VERSION = "6.0.0"; // Versão com 6 targets (cubo completo)
 
 <style>
 body { margin:0; overflow:hidden; }
-
-/* Botão de áudio no canto inferior esquerdo */
 .audio-control-btn {
   position: fixed;
   bottom: 20px;
@@ -32,20 +30,9 @@ body { margin:0; overflow:hidden; }
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.7);
 }
-
-.audio-control-btn.playing {
-  background-color: rgba(0, 128, 0, 0.8);
-}
-
-.audio-control-btn.paused {
-  background-color: rgba(255, 0, 0, 0.8);
-}
-
-.audio-control-btn:hover {
-  transform: scale(1.1);
-}
-
-/* Botão de VR no canto inferior direito */
+.audio-control-btn.playing { background-color: rgba(0, 128, 0, 0.8); }
+.audio-control-btn.paused { background-color: rgba(255, 0, 0, 0.8); }
+.audio-control-btn:hover { transform: scale(1.1); }
 .a-enter-vr {
   position: fixed;
   bottom: 20px !important;
@@ -54,469 +41,477 @@ body { margin:0; overflow:hidden; }
   top: auto !important;
   transform: none !important;
 }
-
-/* Instruções */
-.instructions {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  color: white;
-  background: rgba(0,0,0,0.5);
-  padding: 8px 15px;
-  border-radius: 20px;
-  font-size: 14px;
-  z-index: 9999;
-}
-
-/* Indicador de face (opcional) */
-.face-indicator {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  color: white;
-  background: rgba(0,0,0,0.7);
-  padding: 10px 20px;
-  border-radius: 30px;
-  font-size: 16px;
-  z-index: 9999;
-  border: 2px solid #00ff88;
-}
 </style>
 </head>
 
 <body>
-  <!-- Instruções -->
-  <div class="instructions">
-    🎲 Cubo de 6 faces | Aponte para cada lado
-  </div>
 
-  <!-- Indicador de face ativa -->
-  <div class="face-indicator" id="faceIndicator">
-    🔴 Nenhuma face detectada
-  </div>
+<a-scene
+  mindar-image="imageTargetSrc: targets.mind;"
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: false">
 
-  <a-scene
-    mindar-image="imageTargetSrc: cubo-6-faces.mind;" <!-- Arquivo com 6 targets -->
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false">
+  <a-camera position="0 0 0" look-controls="enabled: false">
+    <a-entity cursor="fuse: false; rayOrigin: mouse"
+              raycaster="objects: .clickable"
+              geometry="primitive: ring; radiusInner: 0.001; radiusOuter: 0.001"
+              material="transparent: true">
+    </a-entity>
+  </a-camera>
 
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-    <!-- ========================================= -->
-    <!-- FACE 1 - MASCOTE PRINCIPAL                -->
-    <!-- ========================================= -->
-    <a-entity mindar-image-target="targetIndex: 0" id="face-1">
-      <a-entity
-        id="mascote"
-        gltf-model="Cena01Teste.glb"
-        animation-mixer="clip: fala; loop: repeat;"
-        position="0 0 0.3"
-        rotation="-90 0 0"
-        scale="0.7 0.7 0.7">
-      </a-entity>
-      <a-entity id="Moo.mp3" 
-                sound="src: mascote-fala.mp3; positional: false; autoplay: false; loop: false;">
-      </a-entity>
+  <!-- ========================================= -->
+  <!-- BLOCO DE CENA - TARGET 0                  -->
+  <!-- ========================================= -->
+  <!-- 
+    INSTRUÇÕES:
+    1. Copie este bloco para cada target
+    2. Mude targetIndex="0" para 1, 2, 3...
+    3. Mude id="cena-00" para cena-01, cena-02...
+    4. Preencha apenas o que você quer usar
+    5. Deixe em branco o que não quiser usar
+  -->
+  <a-entity mindar-image-target="targetIndex: 0" id="cena-00" class="cena">
+    
+    <!-- ========== MODELO 3D ========== -->
+    <!-- Coloque o nome do arquivo .glb ou deixe vazio -->
+    <a-entity
+      id="modelo-cena00"
+      gltf-model=""        <!-- Ex: "mascote.glb" -->
+      animation-mixer="clip: ; loop: repeat;"  <!-- Ex: "fala" -->
+      position="0 0 0.3"
+      rotation="-90 0 0"
+      scale="0.7 0.7 0.7"
+      visible="false">     <!-- Não mexer -->
+    </a-entity>
+    
+    <!-- ========== ÁUDIO ========== -->
+    <!-- Coloque o nome do arquivo .mp3 ou deixe vazio -->
+    <audio id="audio-cena00" preload="auto" loop style="display: none;">
+      <source src="" type="audio/mpeg">  <!-- Ex: "musica.mp3" -->
+    </audio>
+    
+    <!-- ========== VÍDEO ========== -->
+    <!-- Coloque o nome do arquivo .mp4 ou deixe vazio -->
+    <video id="video-cena00" preload="auto" loop style="display: none;" crossorigin="anonymous">
+      <source src="" type="video/mp4">  <!-- Ex: "video.mp4" -->
+    </video>
+    
+    <!-- Tela do vídeo (aparece automaticamente se tiver vídeo) -->
+    <a-entity
+      id="video-screen-cena00"
+      geometry="primitive: plane; width: 1; height: 0.56"
+      material="shader: flat; src: #video-cena00; transparent: true;"
+      position="0 0 0.3"
+      rotation="-90 0 0"
+      scale="0.7 0.7 0.7"
+      visible="false">     <!-- Não mexer -->
     </a-entity>
 
-    <!-- ========================================= -->
-    <!-- FACE 2 - VÍDEO PROMOCIONAL                 -->
-    <!-- ========================================= -->
-    <a-entity mindar-image-target="targetIndex: 1" id="face-2">
-      <a-entity
-        id="Video Antecipe Portugues 1.mp4"
-        geometry="primitive: plane; width: 1; height: 0.56"
-        material="shader: flat; src: #video1; transparent: true;"
-        position="0 0 0.3"
-        rotation="-90 0 0"
-        scale="0.7 0.7 0.7">
-      </a-entity>
-      <video id="video1" src="video-promo.mp4" preload="auto" style="display: none;" crossorigin="anonymous" loop></video>
-    </a-entity>
-
-    <!-- ========================================= -->
-    <!-- FACE 3 - MASCOTE DANÇANDO                  -->
-    <!-- ========================================= -->
-    <a-entity mindar-image-target="targetIndex: 2" id="face-3">
-      <a-entity
-        id="mascote-danca"
-        gltf-model="MascoteDanca.glb"
-        animation-mixer="clip: danca; loop: repeat;"
-        position="0 0 0.3"
-        rotation="-90 0 0"
-        scale="0.7 0.7 0.7">
-      </a-entity>
-      <a-entity id="Chuva02.mp3" 
-                sound="src: musica-danca.mp3; positional: false; autoplay: false; loop: false;">
-      </a-entity>
-    </a-entity>
-
-    <!-- ========================================= -->
-    <!-- FACE 4 - VÍDEO TUTORIAL                    -->
-    <!-- ========================================= -->
-    <a-entity mindar-image-target="targetIndex: 3" id="face-4">
-      <a-entity
-        id="video2-screen"
-        geometry="primitive: plane; width: 1; height: 0.56"
-        material="shader: flat; src: #video2; transparent: true;"
-        position="0 0 0.3"
-        rotation="-90 0 0"
-        scale="0.7 0.7 0.7">
-      </a-entity>
-      <video id="video2" src="video-tutorial.mp4" preload="auto" style="display: none;" crossorigin="anonymous" loop></video>
-    </a-entity>
-
-    <!-- ========================================= -->
-    <!-- FACE 5 - CENA INTERATIVA (Botões)         -->
-    <!-- ========================================= -->
-    <a-entity mindar-image-target="targetIndex: 4" id="face-5">
-      <!-- Modelo base -->
-      <a-entity
-        id="cena-interativa"
-        gltf-model="cena-base.glb"
-        animation-mixer="clip: idle; loop: repeat;"
-        position="0 0 0.3"
-        rotation="-90 0 0"
-        scale="0.7 0.7 0.7">
+    <!-- ========== BOTÕES ========== -->
+    <!-- 
+      COMO USAR:
+      1. Copie o bloco <a-entity class="clickable botao"> abaixo
+      2. Cole quantos botões quiser
+      3. Preencha os dados:
+         - position: onde o botão aparece (x y z)
+         - data-acao: o que faz (cena, url, whatsapp, email)
+         - data-valor: para onde vai (cena-01, https://...)
+         - data-cena-origem: de qual cena este botão veio (cena-00)
+         - Cor do material
+         - Texto do botão (value)
+    -->
+    
+    <!-- EXEMPLO DE BOTÃO 1 - Vai para outra cena -->
+    <a-entity class="clickable botao"
+              geometry="primitive: sphere; radius: 0.1"
+              material="color: #ff4444; emissive: #440000;"
+              position="0.3 0.2 0.4"
+              scale="0.7 0.7 0.7"
+              data-acao="cena"
+              data-valor="cena-01"        <!-- Para qual cena -->
+              data-cena-origem="cena-00"   <!-- De onde veio -->
+              visible="false">             <!-- Não mexer -->
+      
+      <!-- Texto do botão (mude o texto) -->
+      <a-entity text="value: 01; color: white; align: center; width: 2"
+                position="0 0.15 0"
+                scale="0.3 0.3 0.3">
       </a-entity>
       
-      <!-- Áudio ambiente -->
-      <a-entity id="audio-ambiente" 
-                sound="src: ambiente.mp3; positional: false; autoplay: false; loop: true;">
-      </a-entity>
+      <!-- Animação de flutuação (opcional) -->
+      <a-animation attribute="position"
+                   from="0.3 0.2 0.4"
+                   to="0.3 0.27 0.4"
+                   dur="1000"
+                   direction="alternate"
+                   repeat="indefinite">
+      </a-animation>
     </a-entity>
 
-    <!-- ========================================= -->
-    <!-- FACE 6 - LOGO / CRÉDITOS                   -->
-    <!-- ========================================= -->
-    <a-entity mindar-image-target="targetIndex: 5" id="face-6">
-      <!-- Logo 3D -->
-      <a-entity
-        id="logo"
-        gltf-model="logo.glb"
-        animation-mixer="clip: girar; loop: repeat;"
-        position="0 0 0.3"
-        rotation="-90 0 0"
-        scale="0.5 0.5 0.5">
-      </a-entity>
+    <!-- EXEMPLO DE BOTÃO 2 - Abre URL -->
+    <a-entity class="clickable botao"
+              geometry="primitive: sphere; radius: 0.1"
+              material="color: #44ff44; emissive: #004400;"
+              position="-0.3 0.2 0.4"
+              scale="0.7 0.7 0.7"
+              data-acao="url"
+              data-valor="https://google.com"  <!-- URL -->
+              data-cena-origem="cena-00"
+              visible="false">
       
-      <!-- Música de fundo -->
-      <a-entity id="audio-logo" 
-                sound="src: musica-fundo.mp3; positional: false; autoplay: false; loop: true;">
+      <a-entity text="value: 🌐; color: white; align: center; width: 2"
+                position="0 0.15 0"
+                scale="0.3 0.3 0.3">
       </a-entity>
     </a-entity>
 
-  </a-scene>
+    <!-- EXEMPLO DE BOTÃO 3 - WhatsApp -->
+    <a-entity class="clickable botao"
+              geometry="primitive: sphere; radius: 0.1"
+              material="color: #25D366; emissive: #004400;"
+              position="0 0.2 0.4"
+              scale="0.7 0.7 0.7"
+              data-acao="whatsapp"
+              data-valor="https://wa.me/5511999999999"
+              data-cena-origem="cena-00"
+              visible="false">
+      
+      <a-entity text="value: 📱; color: white; align: center; width: 2"
+                position="0 0.15 0"
+                scale="0.3 0.3 0.3">
+      </a-entity>
+    </a-entity>
 
-  <!-- Botão de controle de áudio -->
-  <button class="audio-control-btn paused" id="audioBtn">🔇</button>
+    <!-- EXEMPLO DE BOTÃO 4 - Email -->
+    <a-entity class="clickable botao"
+              geometry="primitive: sphere; radius: 0.1"
+              material="color: #ffaa44; emissive: #442200;"
+              position="0.6 0.2 0.4"
+              scale="0.7 0.7 0.7"
+              data-acao="email"
+              data-valor="mailto:contato@email.com"
+              data-cena-origem="cena-00"
+              visible="false">
+      
+      <a-entity text="value: ✉️; color: white; align: center; width: 2"
+                position="0 0.15 0"
+                scale="0.3 0.3 0.3">
+      </a-entity>
+    </a-entity>
 
-  <script>
+  </a-entity>
+  <!-- ===== FIM DO BLOCO DA CENA 00 ===== -->
+
+
+  <!-- ========================================= -->
+  <!-- BLOCO DE CENA - TARGET 1                  -->
+  <!-- ========================================= -->
+  <!-- COPIE O BLOCO ACIMA E COLE AQUI -->
+  <!-- DEPOIS MUDE targetIndex="1" E id="cena-01" -->
+  <a-entity mindar-image-target="targetIndex: 1" id="cena-01" class="cena">
+    
+    <!-- MODELO 3D -->
+    <a-entity
+      id="modelo-cena01"
+      gltf-model=""        <!-- EX: "milho-chuva.glb" -->
+      animation-mixer="clip: ; loop: repeat;"
+      position="0 0 0.3"
+      rotation="-90 0 0"
+      scale="0.7 0.7 0.7"
+      visible="false">
+    </a-entity>
+    
+    <!-- ÁUDIO -->
+    <audio id="audio-cena01" preload="auto" loop style="display: none;">
+      <source src="" type="audio/mpeg">  <!-- EX: "chuva.mp3" -->
+    </audio>
+    
+    <!-- VÍDEO -->
+    <video id="video-cena01" preload="auto" loop style="display: none;" crossorigin="anonymous">
+      <source src="" type="video/mp4">
+    </video>
+    
+    <!-- Tela do vídeo -->
+    <a-entity
+      id="video-screen-cena01"
+      geometry="primitive: plane; width: 1; height: 0.56"
+      material="shader: flat; src: #video-cena01; transparent: true;"
+      position="0 0 0.3"
+      rotation="-90 0 0"
+      scale="0.7 0.7 0.7"
+      visible="false">
+    </a-entity>
+
+    <!-- BOTÕES - COLOQUE SEUS BOTÕES AQUI -->
+    
+    <!-- Botão para voltar à CENA 00 -->
+    <a-entity class="clickable botao"
+              geometry="primitive: sphere; radius: 0.1"
+              material="color: #ffff44; emissive: #444400;"
+              position="0.3 0.2 0.4"
+              scale="0.7 0.7 0.7"
+              data-acao="cena"
+              data-valor="cena-00"
+              data-cena-origem="cena-01"
+              visible="false">
+      
+      <a-entity text="value: 🔙; color: black; align: center; width: 2"
+                position="0 0.15 0"
+                scale="0.3 0.3 0.3">
+      </a-entity>
+    </a-entity>
+
+  </a-entity>
+
+  <!-- ========================================= -->
+  <!-- BLOCO DE CENA - TARGET 2                  -->
+  <!-- ========================================= -->
+  <a-entity mindar-image-target="targetIndex: 2" id="cena-02" class="cena">
+    <!-- COPIE O MODELO AQUI E PREENCHA -->
+  </a-entity>
+
+  <!-- ========================================= -->
+  <!-- BLOCO DE CENA - TARGET 3                  -->
+  <!-- ========================================= -->
+  <a-entity mindar-image-target="targetIndex: 3" id="cena-03" class="cena">
+    <!-- COPIE O MODELO AQUI E PREENCHA -->
+  </a-entity>
+
+  <!-- ========================================= -->
+  <!-- BLOCO DE CENA - TARGET 4                  -->
+  <!-- ========================================= -->
+  <a-entity mindar-image-target="targetIndex: 4" id="cena-04" class="cena">
+    <!-- COPIE O MODELO AQUI E PREENCHA -->
+  </a-entity>
+
+  <!-- ========================================= -->
+  <!-- BLOCO DE CENA - TARGET 5                  -->
+  <!-- ========================================= -->
+  <a-entity mindar-image-target="targetIndex: 5" id="cena-05" class="cena">
+    <!-- COPIE O MODELO AQUI E PREENCHA -->
+  </a-entity>
+
+</a-scene>
+
+<!-- Botão de áudio -->
+<button class="audio-control-btn paused" id="audioBtn">🔇</button>
+
+<script>
 document.addEventListener("DOMContentLoaded", function () {
+  
   // ============================================
-  // CONFIGURAÇÃO DAS 6 FACES DO CUBO
-  // ============================================
-  const faces = [
-    {
-      id: 'face-1',
-      type: 'model',
-      name: 'Face 1 - Mascote Falante',
-      audioId: 'audio-mascote',
-      modelId: 'mascote',
-      videoId: null,
-      currentTime: 0,
-      isPlaying: false,
-      icon: '🧸'
-    },
-    {
-      id: 'face-2',
-      type: 'video',
-      name: 'Face 2 - Vídeo Promo',
-      videoId: 'video1',
-      audioId: null,
-      modelId: null,
-      currentTime: 0,
-      isPlaying: false,
-      icon: '🎬'
-    },
-    {
-      id: 'face-3',
-      type: 'model',
-      name: 'Face 3 - Mascote Dança',
-      audioId: 'audio-danca',
-      modelId: 'mascote-danca',
-      videoId: null,
-      currentTime: 0,
-      isPlaying: false,
-      icon: '💃'
-    },
-    {
-      id: 'face-4',
-      type: 'video',
-      name: 'Face 4 - Tutorial',
-      videoId: 'video2',
-      audioId: null,
-      modelId: null,
-      currentTime: 0,
-      isPlaying: false,
-      icon: '📹'
-    },
-    {
-      id: 'face-5',
-      type: 'model',
-      name: 'Face 5 - Interativa',
-      audioId: 'audio-ambiente',
-      modelId: 'cena-interativa',
-      videoId: null,
-      currentTime: 0,
-      isPlaying: false,
-      icon: '🎮'
-    },
-    {
-      id: 'face-6',
-      type: 'model',
-      name: 'Face 6 - Logo',
-      audioId: 'audio-logo',
-      modelId: 'logo',
-      videoId: null,
-      currentTime: 0,
-      isPlaying: false,
-      icon: '⭐'
-    }
-  ];
-
-  // Elementos da interface
-  const audioBtn = document.getElementById('audioBtn');
-  const faceIndicator = document.getElementById('faceIndicator');
-  let globalPlaying = false;
-  let currentFaceIndex = -1;
-
-  // ============================================
-  // FUNÇÕES DE CONTROLE
+  // SISTEMA DE GERENCIAMENTO (NÃO PRECISA MEXER)
   // ============================================
   
-  function pauseFace(faceIndex) {
-    const face = faces[faceIndex];
-    if (!face || !face.isPlaying) return;
-    
-    console.log(`⏸️ Pausando ${face.name}`);
-    
-    if (face.type === 'model') {
-      // Pausar áudio
-      if (face.audioId) {
-        const audio = document.querySelector('#' + face.audioId);
-        if (audio && audio.components.sound) {
-          face.currentTime = audio.components.sound.currentTime || 0;
-          audio.components.sound.stopSound();
-        }
-      }
-      
-      // Pausar animação
-      if (face.modelId) {
-        const model = document.querySelector('#' + face.modelId);
-        if (model) {
-          model.setAttribute('animation-mixer', 'timeScale', 0);
-        }
-      }
-    }
-    else if (face.type === 'video') {
-      // Pausar vídeo
-      const video = document.querySelector('#' + face.videoId);
-      if (video) {
-        face.currentTime = video.currentTime;
-        video.pause();
-      }
-    }
-    
-    face.isPlaying = false;
-    checkGlobalState();
-  }
+  // Coletar todas as cenas disponíveis
+  const cenas = [];
+  document.querySelectorAll('.cena').forEach(cena => {
+    cenas.push(cena.id);
+  });
 
-  function resumeFace(faceIndex) {
-    const face = faces[faceIndex];
-    if (!face) return;
-    
-    // Se já tem uma face tocando, pausa ela primeiro
-    if (currentFaceIndex >= 0 && currentFaceIndex !== faceIndex) {
-      pauseFace(currentFaceIndex);
-    }
-    
-    console.log(`▶️ Continuando ${face.name}`);
-    
-    if (face.type === 'model') {
-      // Continuar áudio
-      if (face.audioId) {
-        const audio = document.querySelector('#' + face.audioId);
-        if (audio && audio.components.sound) {
-          audio.components.sound.currentTime = face.currentTime;
-          audio.components.sound.playSound();
-        }
-      }
-      
-      // Continuar animação
-      if (face.modelId) {
-        const model = document.querySelector('#' + face.modelId);
-        if (model) {
-          model.setAttribute('animation-mixer', 'timeScale', 1);
-        }
-      }
-    }
-    else if (face.type === 'video') {
-      // Continuar vídeo
-      const video = document.querySelector('#' + face.videoId);
-      if (video) {
-        video.currentTime = face.currentTime;
-        video.play().catch(e => console.log('Aguardando interação:', e));
-      }
-    }
-    
-    face.isPlaying = true;
-    currentFaceIndex = faceIndex;
-    updateFaceIndicator(faceIndex);
-    checkGlobalState();
-  }
+  // Estado de cada cena
+  const estadoCenas = {};
+  cenas.forEach(cenaId => {
+    estadoCenas[cenaId] = {
+      tempoAudio: 0,
+      tempoVideo: 0,
+      ativa: false
+    };
+  });
 
-  // ============================================
-  // ATUALIZAR INDICADOR DE FACE
-  // ============================================
-  function updateFaceIndicator(faceIndex) {
-    const face = faces[faceIndex];
-    if (face) {
-      faceIndicator.innerHTML = `🎲 ${face.icon} ${face.name}`;
-      faceIndicator.style.borderColor = '#00ff88';
-    } else {
-      faceIndicator.innerHTML = '🔴 Nenhuma face detectada';
-      faceIndicator.style.borderColor = '#ff4444';
-    }
-  }
-
-  // ============================================
-  // VERIFICAR ESTADO GLOBAL
-  // ============================================
-  function checkGlobalState() {
-    globalPlaying = faces.some(f => f.isPlaying);
-    
-    if (globalPlaying) {
-      audioBtn.innerHTML = '🔊';
-      audioBtn.classList.add('playing');
-      audioBtn.classList.remove('paused');
-    } else {
-      audioBtn.innerHTML = '🔇';
-      audioBtn.classList.add('paused');
-      audioBtn.classList.remove('playing');
-    }
-  }
-
-  // ============================================
-  // DESBLOQUEAR MÍDIAS
-  // ============================================
+  let cenaAtual = null;
   let mediaUnlocked = false;
-  
-  function unlockAllMedia() {
-    if (mediaUnlocked) return;
+  const audioBtn = document.getElementById('audioBtn');
+
+  // ============================================
+  // FUNÇÃO PARA ATIVAR UMA CENA
+  // ============================================
+  window.ativarCena = function(cenaId) {
+    console.log('🎬 Ativando:', cenaId);
     
-    console.log('🔓 Desbloqueando mídias...');
+    // Desativar cena atual
+    if (cenaAtual && cenaAtual !== cenaId) {
+      desativarCena(cenaAtual);
+    }
     
-    faces.forEach(face => {
-      if (face.type === 'model' && face.audioId) {
-        const audio = document.querySelector('#' + face.audioId);
-        if (audio && audio.components.sound) {
-          audio.components.sound.playSound();
-          audio.components.sound.stopSound();
-        }
+    const cenaEl = document.getElementById(cenaId);
+    if (!cenaEl) return;
+    
+    // ATIVAR MODELO 3D
+    const modelo = cenaEl.querySelector('[gltf-model]');
+    if (modelo && modelo.getAttribute('gltf-model')) {
+      modelo.setAttribute('visible', 'true');
+      modelo.setAttribute('animation-mixer', 'timeScale', 1);
+    }
+    
+    // ATIVAR VÍDEO
+    const video = document.getElementById(`video-${cenaId}`);
+    const tela = document.getElementById(`video-screen-${cenaId}`);
+    if (video && video.querySelector('source').src && tela) {
+      video.currentTime = estadoCenas[cenaId].tempoVideo;
+      tela.setAttribute('visible', 'true');
+      if (mediaUnlocked) {
+        video.play().catch(() => {});
       }
-      else if (face.type === 'video' && face.videoId) {
-        const video = document.querySelector('#' + face.videoId);
-        if (video) {
-          video.play().then(() => video.pause()).catch(() => {});
-        }
+    }
+    
+    // ATIVAR ÁUDIO
+    const audio = document.getElementById(`audio-${cenaId}`);
+    if (audio && audio.querySelector('source').src) {
+      audio.currentTime = estadoCenas[cenaId].tempoAudio;
+      if (mediaUnlocked) {
+        audio.play().catch(() => {});
+      }
+    }
+    
+    // ATIVAR BOTÕES
+    cenaEl.querySelectorAll('.botao').forEach(btn => {
+      if (btn.getAttribute('data-acao')) { // Só mostra se tiver ação configurada
+        btn.setAttribute('visible', 'true');
       }
     });
     
-    mediaUnlocked = true;
-    console.log('✅ Mídias desbloqueadas!');
+    estadoCenas[cenaId].ativa = true;
+    cenaAtual = cenaId;
+    atualizarBotaoAudio();
+  };
+
+  // ============================================
+  // FUNÇÃO PARA DESATIVAR UMA CENA
+  // ============================================
+  function desativarCena(cenaId) {
+    const cenaEl = document.getElementById(cenaId);
+    if (!cenaEl) return;
+    
+    // SALVAR TEMPO DO ÁUDIO
+    const audio = document.getElementById(`audio-${cenaId}`);
+    if (audio) {
+      estadoCenas[cenaId].tempoAudio = audio.currentTime;
+      audio.pause();
+    }
+    
+    // SALVAR TEMPO DO VÍDEO
+    const video = document.getElementById(`video-${cenaId}`);
+    if (video) {
+      estadoCenas[cenaId].tempoVideo = video.currentTime;
+      video.pause();
+    }
+    
+    // PAUSAR ANIMAÇÃO
+    const modelo = cenaEl.querySelector('[gltf-model]');
+    if (modelo) {
+      modelo.setAttribute('animation-mixer', 'timeScale', 0);
+    }
+    
+    // ESCONDER TUDO
+    cenaEl.querySelectorAll('[visible="true"]').forEach(el => {
+      if (el.id !== cenaId) {
+        el.setAttribute('visible', 'false');
+      }
+    });
+    
+    estadoCenas[cenaId].ativa = false;
   }
 
   // ============================================
-  // DETECTAR FACES DO CUBO
+  // DETECTAR TARGETS
   // ============================================
-  faces.forEach((face, index) => {
-    const faceEl = document.getElementById(face.id);
-    
-    if (faceEl) {
-      faceEl.addEventListener("targetFound", () => {
-        console.log(`🎯 FACE ENCONTRADA: ${face.name}`);
-        resumeFace(index);
-      });
+  document.querySelectorAll('.cena').forEach(cena => {
+    cena.addEventListener("targetFound", () => {
+      ativarCena(cena.id);
+    });
 
-      faceEl.addEventListener("targetLost", () => {
-        console.log(`🚫 FACE PERDIDA: ${face.name}`);
-        pauseFace(index);
-        if (currentFaceIndex === index) {
-          currentFaceIndex = -1;
-          updateFaceIndicator(-1);
-        }
-      });
-    }
-  });
-
-  // ============================================
-  // BOTÃO MANUAL
-  // ============================================
-  audioBtn.addEventListener('click', function() {
-    unlockAllMedia();
-    
-    if (currentFaceIndex >= 0) {
-      // Se tem face ativa, pausa
-      pauseFace(currentFaceIndex);
-    } else {
-      // Se não tem face ativa, tenta a última
-      const lastFace = faces.findIndex(f => f.currentTime > 0);
-      if (lastFace >= 0) {
-        resumeFace(lastFace);
-      }
-    }
-  });
-
-  // ============================================
-  // DESBLOQUEAR NO PRIMEIRO CLIQUE
-  // ============================================
-  document.body.addEventListener('click', unlockAllMedia, { once: true });
-  document.body.addEventListener('touchstart', unlockAllMedia, { once: true });
-
-  // ============================================
-  // MONITORAR TEMPOS
-  // ============================================
-  setInterval(() => {
-    faces.forEach(face => {
-      if (face.isPlaying) {
-        if (face.type === 'model' && face.audioId) {
-          const audio = document.querySelector('#' + face.audioId);
-          if (audio && audio.components.sound) {
-            face.currentTime = audio.components.sound.currentTime || 0;
-          }
-        }
-        else if (face.type === 'video' && face.videoId) {
-          const video = document.querySelector('#' + face.videoId);
-          if (video) {
-            face.currentTime = video.currentTime;
-          }
-        }
+    cena.addEventListener("targetLost", () => {
+      if (cenaAtual === cena.id) {
+        desativarCena(cena.id);
+        cenaAtual = null;
+        atualizarBotaoAudio();
       }
     });
-  }, 500);
+  });
 
-  console.log('🚀 Cubo de 6 faces iniciado!');
-  console.log('📋 Faces configuradas:', faces.length);
+  // ============================================
+  // BOTÕES DE AÇÃO
+  // ============================================
+  document.querySelectorAll('.botao').forEach(botao => {
+    botao.addEventListener('click', function(e) {
+      e.stopPropagation();
+      
+      const acao = this.getAttribute('data-acao');
+      const valor = this.getAttribute('data-valor');
+      const cenaOrigem = this.getAttribute('data-cena-origem');
+      
+      console.log(`👆 Ação: ${acao} → ${valor}`);
+      
+      // Feedback visual
+      this.setAttribute('material', 'emissive', '#ffffff');
+      setTimeout(() => {
+        this.setAttribute('material', 'emissive', this.getAttribute('material').emissive);
+      }, 200);
+      
+      // Processar ação
+      switch(acao) {
+        case 'cena':
+          // Salvar estado da cena atual
+          if (cenaOrigem) {
+            const audio = document.getElementById(`audio-${cenaOrigem}`);
+            if (audio) estadoCenas[cenaOrigem].tempoAudio = audio.currentTime;
+            const video = document.getElementById(`video-${cenaOrigem}`);
+            if (video) estadoCenas[cenaOrigem].tempoVideo = video.currentTime;
+          }
+          // Ativar nova cena
+          ativarCena(valor);
+          break;
+          
+        case 'url':
+        case 'whatsapp':
+        case 'email':
+          window.open(valor, '_blank');
+          break;
+      }
+    });
+  });
+
+  // ============================================
+  // BOTÃO DE ÁUDIO GLOBAL
+  // ============================================
+  function atualizarBotaoAudio() {
+    const tocando = Object.values(estadoCenas).some(e => e.ativa);
+    audioBtn.innerHTML = tocando ? '🔊' : '🔇';
+    audioBtn.className = `audio-control-btn ${tocando ? 'playing' : 'paused'}`;
+  }
+
+  audioBtn.addEventListener('click', function() {
+    if (!mediaUnlocked) {
+      mediaUnlocked = true;
+      document.querySelectorAll('audio, video').forEach(m => {
+        m.play().then(() => m.pause()).catch(() => {});
+      });
+    }
+    
+    if (cenaAtual) {
+      if (estadoCenas[cenaAtual].ativa) {
+        desativarCena(cenaAtual);
+      } else {
+        ativarCena(cenaAtual);
+      }
+    }
+  });
+
+  // Desbloquear mídia no primeiro clique
+  document.body.addEventListener('click', function unlock() {
+    if (!mediaUnlocked) {
+      mediaUnlocked = true;
+      document.querySelectorAll('audio, video').forEach(m => {
+        m.play().then(() => m.pause()).catch(() => {});
+      });
+    }
+  }, { once: true });
+
+  console.log('🚀 Sistema de blocos genéricos pronto!');
+  console.log('📋 Cenas disponíveis:', cenas);
 });
 </script>
 
-<!-- Vídeos ocultos -->
-<div style="display: none;">
-  <video id="video1" preload="auto" crossorigin="anonymous"></video>
-  <video id="video2" preload="auto" crossorigin="anonymous"></video>
-</div>
-
 </body>
 </html>
-
