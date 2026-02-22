@@ -30,7 +30,7 @@ button {
 <!-- 🔥 CONTROLE DE VERSÃO -->
 <!-- ===================== -->
 <script>
-const VERSION = "1.0.0"; 
+const VERSION = "1.1.0"; 
 // ↑ SEMPRE que atualizar modelo ou target,
 // só mude esse número
 </script>
@@ -45,6 +45,9 @@ const VERSION = "1.0.0";
 
 <a-scene
   id="sceneAR"
+  mindar-image="imageTargetSrc: assets/TargetBalboa.mind;"
+  color-space="sRGB"
+  renderer="colorManagement: true; physicallyCorrectLights"
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false"
 >
@@ -72,7 +75,7 @@ arScene.innerHTML += `
   <a-entity id="scene1">
     <a-entity
       id="model1"
-      gltf-model="assets/modelo1.glb?v=${VERSION}"
+      gltf-model="assets/RockyBalboa02.glb"
       position="0 0 0.3"
       rotation="0 0 0"
       scale="1 1 1">
@@ -125,4 +128,5 @@ function goScene(n){
 </script>
 
 </body>
+
 </html>
