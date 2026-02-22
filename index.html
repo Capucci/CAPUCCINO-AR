@@ -1,233 +1,215 @@
 <!DOCTYPE html>
 <html>
 <head>
-   <script>
-const VERSION = "7.1.0"; 
-</script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-
-<style>
-body { margin:0; overflow:hidden; }
-.audio-control-btn {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  z-index: 9999;
-  cursor: pointer;
-  border: 2px solid white;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.7);
-}
-.audio-control-btn.playing { background-color: rgba(0, 128, 0, 0.8); }
-.audio-control-btn.paused { background-color: rgba(255, 0, 0, 0.8); }
-.audio-control-btn:hover { transform: scale(1.1); }
-.a-enter-vr {
-  position: fixed;
-  bottom: 20px !important;
-  right: 20px !important;
-  left: auto !important;
-  top: auto !important;
-  transform: none !important;
-}
-/* Debug - mostra status */
-#debug-status {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: rgba(0,0,0,0.7);
-  color: #00ff88;
-  padding: 10px;
-  border-radius: 5px;
-  z-index: 10000;
-  font-family: monospace;
-  font-size: 12px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Multi Targets</title>
+    
+    <!-- Bibliotecas -->
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    
+    <style>
+        body { margin: 0; overflow: hidden; }
+        
+        /* Botão de áudio */
+        .audio-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            z-index: 9999;
+            cursor: pointer;
+            border: 2px solid white;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .playing { background: rgba(0,128,0,0.8); }
+        .paused { background: rgba(255,0,0,0.8); }
+        
+        /* Loading */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 10000;
+        }
+    </style>
 </head>
-
 <body>
 
-<!-- Debug status -->
-<div id="debug-status">📡 Inicializando...</div>
+    <!-- Loading -->
+    <div id="loading">📱 Inicializando AR...</div>
 
-<a-scene
-  mindar-image="imageTargetSrc: Target01.mind; autoStart: true;" <!-- Use UM arquivo .mind -->
-  vr-mode-ui="enabled: false"
-  device-orientation-permission-ui="enabled: false"
-  embedded
-  arjs="sourceType: webcam; debugUIEnabled: false;">
+    <!-- Botão de áudio -->
+    <button class="audio-btn paused" id="audioBtn">🔇</button>
 
-  <a-camera position="0 0 0" look-controls="enabled: false">
-    <a-entity cursor="fuse: false; rayOrigin: mouse"
-              raycaster="objects: .clickable"
-              geometry="primitive: ring; radiusInner: 0.001; radiusOuter: 0.001"
-              material="transparent: true">
-    </a-entity>
-  </a-camera>
+    <a-scene
+        mindar-image="imageTargetSrc: Target01.mind; autoStart: true;"
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false"
+        embedded
+        color-space="sRGB"
+        renderer="colorManagement: true;"
+        background="color: black">
 
-  <!-- ========================================= -->
-  <!-- BLOCO DE CENA 0 - TARGET 0                -->
-  <!-- ========================================= -->
-  <a-entity mindar-image-target="targetIndex: 0" id="cena-00" class="cena">
-    
-    <!-- MODELO 3D -->
-    <a-entity
-      id="modelo-cena00"
-      gltf-model="BonnyCaminha.glbl"
-      animation-mixer="clip: ; loop: repeat;"
-      position="0 0 0.3"
-      rotation="-90 0 0"
-      scale="0.7 0.7 0.7"
-      visible="true">  <!-- Começa visível para teste -->
-    </a-entity>
-    
-    <!-- ÁUDIO -->
-    <audio id="audio-cena00" preload="auto" loop>
-      <source src="Moo.mp3" type="audio/mpeg">
-    </audio>
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-  </a-entity>
+        <!-- TARGET 0 -->
+        <a-entity mindar-image-target="targetIndex: 0">
+            <!-- Modelo 3D -->
+            <a-entity
+                gltf-model="BonnyCaminha.glb"
+                animation-mixer
+                position="0 0 0.3"
+                rotation="-90 0 0"
+                scale="0.7 0.7 0.7">
+            </a-entity>
+            
+            <!-- Áudio -->
+            <a-entity
+                id="audio0"
+                sound="src: Moo.mp3; autoplay: false; loop: true; positional: false;">
+            </a-entity>
+        </a-entity>
 
-  <!-- ========================================= -->
-  <!-- BLOCO DE CENA 1 - TARGET 1                -->
-  <!-- ========================================= -->
-  <a-entity mindar-image-target="targetIndex: 1" id="cena-01" class="cena">
-    
-    <a-entity
-      id="modelo-cena01"
-      gltf-model="Cena 01Teste.glbl"
-      animation-mixer="clip: ; loop: repeat;"
-      position="0 0 0.3"
-      rotation="-90 0 0"
-      scale="0.7 0.7 0.7"
-      visible="true">
-    </a-entity>
-    
-    <audio id="audio-cena01" preload="auto" loop>
-      <source src="Passaros.mp3" type="audio/mpeg">
-    </audio>
+        <!-- TARGET 1 -->
+        <a-entity mindar-image-target="targetIndex: 1">
+            <a-entity
+                gltf-model="Cena 01Teste.glb"
+                animation-mixer
+                position="0 0 0.3"
+                rotation="-90 0 0"
+                scale="0.7 0.7 0.7">
+            </a-entity>
+            
+            <a-entity
+                id="audio1"
+                sound="src: Passaros.mp3; autoplay: false; loop: true; positional: false;">
+            </a-entity>
+        </a-entity>
 
-  </a-entity>
+        <!-- TARGET 2 -->
+        <a-entity mindar-image-target="targetIndex: 2">
+            <a-entity
+                gltf-model="MascoteDanca.glb"
+                animation-mixer
+                position="0 0 0.3"
+                rotation="-90 0 0"
+                scale="0.7 0.7 0.7">
+            </a-entity>
+            
+            <a-entity
+                id="audio2"
+                sound="src: Chuva02.mp3; autoplay: false; loop: true; positional: false;">
+            </a-entity>
+        </a-entity>
 
-  <!-- ========================================= -->
-  <!-- BLOCO DE CENA 2 - TARGET 2                -->
-  <!-- ========================================= -->
-  <a-entity mindar-image-target="targetIndex: 2" id="cena-02" class="cena">
-    
-    <a-entity
-      id="modelo-cena02"
-      gltf-model="MascoteDanca.glbl"
-      animation-mixer="clip: ; loop: repeat;"
-      position="0 0 0.3"
-      rotation="-90 0 0"
-      scale="0.7 0.7 0.7"
-      visible="true">
-    </a-entity>
-    
-    <audio id="audio-cena02" preload="auto" loop>
-      <source src="Chuva02.mp3" type="audio/mpeg">
-    </audio>
+        <!-- TARGET 3 (vazio) -->
+        <a-entity mindar-image-target="targetIndex: 3"></a-entity>
 
-  </a-entity>
+        <!-- TARGET 4 (vazio) -->
+        <a-entity mindar-image-target="targetIndex: 4"></a-entity>
 
-</a-scene>
+        <!-- TARGET 5 (vazio) -->
+        <a-entity mindar-image-target="targetIndex: 5"></a-entity>
 
-<!-- Botão de áudio -->
-<button class="audio-control-btn paused" id="audioBtn">🔇</button>
+    </a-scene>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  
-  const debug = document.getElementById('debug-status');
-  const audioBtn = document.getElementById('audioBtn');
-  
-  // ============================================
-  // TESTE 1: Verificar se os elementos existem
-  // ============================================
-  debug.innerHTML = "🔍 Verificando elementos...";
-  
-  const scene = document.querySelector('a-scene');
-  if (scene) {
-    debug.innerHTML = "✅ Scene carregada";
-  } else {
-    debug.innerHTML = "❌ Scene não encontrada";
-    return;
-  }
-  
-  // ============================================
-  // TESTE 2: Verificar MindAR
-  // ============================================
-  scene.addEventListener('mindar-image-ready', () => {
-    debug.innerHTML = "🎯 MindAR pronto - Aguardando targets...";
-  });
-  
-  scene.addEventListener('mindar-image-target-found', (e) => {
-    debug.innerHTML = `✅ Target encontrado: ${e.detail.targetIndex}`;
-    console.log('Target encontrado:', e.detail);
-  });
-  
-  scene.addEventListener('mindar-image-target-lost', (e) => {
-    debug.innerHTML = `❌ Target perdido: ${e.detail.targetIndex}`;
-  });
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            const loading = document.getElementById('loading');
+            const audioBtn = document.getElementById('audioBtn');
+            
+            // Lista de áudios
+            const audios = ['#audio0', '#audio1', '#audio2'];
+            let currentAudio = null;
+            
+            // Quando a cena carregar
+            const scene = document.querySelector('a-scene');
+            
+            scene.addEventListener('loaded', function() {
+                loading.innerHTML = '✅ Pronto! Aponte para os targets...';
+                setTimeout(() => loading.style.display = 'none', 2000);
+            });
 
-  // ============================================
-  // TESTE 3: Verificar cada target individualmente
-  // ============================================
-  const cenas = document.querySelectorAll('.cena');
-  cenas.forEach((cena, index) => {
-    cena.addEventListener('targetFound', () => {
-      debug.innerHTML = `🎯 CENA ${index} ATIVADA!`;
-      console.log(`Cena ${index} ativada`);
-      
-      // Tocar áudio da cena
-      const audio = document.getElementById(`audio-cena0${index}`);
-      if (audio) {
-        audio.play().catch(e => console.log('Áudio bloqueado:', e));
-      }
-    });
-    
-    cena.addEventListener('targetLost', () => {
-      debug.innerHTML = `👋 CENA ${index} perdida`;
-      console.log(`Cena ${index} perdida`);
-      
-      const audio = document.getElementById(`audio-cena0${index}`);
-      if (audio) {
-        audio.pause();
-      }
-    });
-  });
+            // Detectar targets
+            const targets = document.querySelectorAll('[mindar-image-target]');
+            
+            targets.forEach((target, index) => {
+                target.addEventListener('targetFound', () => {
+                    console.log(`🎯 Target ${index} encontrado!`);
+                    loading.style.display = 'block';
+                    loading.innerHTML = `✅ Target ${index} encontrado!`;
+                    setTimeout(() => loading.style.display = 'none', 1000);
+                    
+                    // Parar áudio anterior
+                    if (currentAudio) {
+                        currentAudio.components.sound.stopSound();
+                    }
+                    
+                    // Tocar novo áudio
+                    if (index < audios.length) {
+                        const audio = document.querySelector(audios[index]);
+                        if (audio) {
+                            audio.components.sound.playSound();
+                            currentAudio = audio;
+                            audioBtn.classList.add('playing');
+                            audioBtn.classList.remove('paused');
+                            audioBtn.innerHTML = '🔊';
+                        }
+                    }
+                });
 
-  // ============================================
-  // Botão de áudio
-  // ============================================
-  audioBtn.addEventListener('click', () => {
-    // Desbloquear áudio
-    document.querySelectorAll('audio').forEach(audio => {
-      audio.play().then(() => {
-        audio.pause();
-        audio.currentTime = 0;
-      }).catch(e => console.log('Erro ao desbloquear:', e));
-    });
-    
-    audioBtn.classList.toggle('playing');
-    audioBtn.classList.toggle('paused');
-    audioBtn.innerHTML = audioBtn.classList.contains('playing') ? '🔊' : '🔇';
-  });
+                target.addEventListener('targetLost', () => {
+                    console.log(`🚫 Target ${index} perdido!`);
+                    
+                    if (currentAudio) {
+                        currentAudio.components.sound.stopSound();
+                        currentAudio = null;
+                        audioBtn.classList.remove('playing');
+                        audioBtn.classList.add('paused');
+                        audioBtn.innerHTML = '🔇';
+                    }
+                });
+            });
 
-  console.log('🚀 Sistema iniciado');
-});
-</script>
+            // Botão de áudio manual
+            audioBtn.addEventListener('click', function() {
+                if (currentAudio) {
+                    currentAudio.components.sound.stopSound();
+                    currentAudio = null;
+                    audioBtn.classList.remove('playing');
+                    audioBtn.classList.add('paused');
+                    audioBtn.innerHTML = '🔇';
+                }
+            });
+
+            // Desbloquear áudio no primeiro clique
+            document.body.addEventListener('click', function unlock() {
+                document.querySelectorAll('[sound]').forEach(el => {
+                    el.components.sound.playSound();
+                    el.components.sound.stopSound();
+                });
+                document.body.removeEventListener('click', unlock);
+            });
+
+            console.log('🚀 AR iniciado!');
+        });
+    </script>
 
 </body>
 </html>
