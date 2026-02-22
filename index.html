@@ -59,147 +59,60 @@ body { margin:0; overflow:hidden; }
     </a-entity>
   </a-camera>
 
-  <!-- ========================================= -->
-  <!-- BLOCO DE CENA 0 - TARGET 0                  -->
-  <!-- ========================================= -->
-  <!-- 
-    INSTRUÇÕES:
-    1. Copie este bloco para cada target
-    2. Mude targetIndex="0" para 1, 2, 3...
-    3. Mude id="cena-00" para cena-01, cena-02...
-    4. Preencha apenas o que você quer usar
-    5. Deixe em branco o que não quiser usar
-  -->
-  <a-entity mindar-image-target="targetIndex: 0" id="cena-00" class="cena">
-    
-    <!-- ========== MODELO 3D ========== -->
-    <!-- Coloque o nome do arquivo .glb ou deixe vazio -->
+ <!-- ========================================= -->
+<!-- BLOCO DE CENA 0 - TARGET 0                -->
+<!-- ========================================= -->
+<a-entity mindar-image-target="targetIndex: 0" id="cena-00" class="cena">
+
+    <!-- ====== MODELO 3D ========= -->
     <a-entity
-      id="modelo-cena00"
-      gltf-model=""        <!-- Ex: "mascote.glb" -->
-      animation-mixer="clip: ; loop: repeat;"  <!-- Ex: "fala" -->
-      position="0 0 0.3"
-      rotation="-90 0 0"
-      scale="0.7 0.7 0.7"
-      visible="false">     <!-- Não mexer -->
-    </a-entity>
-    
-    <!-- ========== ÁUDIO ========== -->
-    <!-- Coloque o nome do arquivo .mp3 ou deixe vazio -->
+        id="modelo-cena00"
+        gltf-model="BonnyCaminha.glbl"  <!-- ou deixe vazio "" se não usar -->
+        animation-mixer="clip: ; loop: repeat;"  <!-- coloque o nome da animação -->
+        position="0 0 0.3"
+        rotation="-90 0 0"
+        scale="0.7 0.7 0.7"
+        visible="false">
+    </a-entity>  ← A TAG FECHA AQUI CORRETAMENTE
+
+    <!-- ====== ÁUDIO ========= -->
     <audio id="audio-cena00" preload="auto" loop style="display: none;">
-      <source src="" type="audio/mpeg">  <!-- Ex: "musica.mp3" -->
+        <source src="Moo.mp3" type="audio/mpeg">  <!-- ou deixe vazio "" -->
     </audio>
-    
-    <!-- ========== VÍDEO ========== -->
-    <!-- Coloque o nome do arquivo .mp4 ou deixe vazio -->
+
+    <!-- ====== VÍDEO ========= -->
     <video id="video-cena00" preload="auto" loop style="display: none;" crossorigin="anonymous">
-      <source src="" type="VideoAntecipePortugues1.mp4">  <!-- Ex: "video.mp4" -->
+        <source src="Video Antecipe Portugues 1.mp4" type="video/mp4">  <!-- ou deixe vazio "" -->
     </video>
-    
-    <!-- Tela do vídeo (aparece automaticamente se tiver vídeo) -->
+
+    <!-- ====== TELA DO VÍDEO ========= -->
     <a-entity
-      id="video-screen-cena00"
-      geometry="primitive: plane; width: 1; height: 0.56"
-      material="shader: flat; src: #video-cena00; transparent: true;"
-      position="0 0 0.3"
-      rotation="-90 0 0"
-      scale="0.7 0.7 0.7"
-      visible="false">     <!-- Não mexer -->
+        id="video-screen-cena00"
+        geometry="primitive: plane; width: 1; height: 0.56"
+        material="shader: flat; src: #video-cena00; transparent: true;"
+        position="0 0 0.3"
+        rotation="-90 0 0"
+        scale="0.7 0.7 0.7"
+        visible="false">
     </a-entity>
 
-    <!-- ========== BOTÕES ========== -->
-    <!-- 
-      COMO USAR:
-      1. Copie o bloco <a-entity class="clickable botao"> abaixo
-      2. Cole quantos botões quiser
-      3. Preencha os dados:
-         - position: onde o botão aparece (x y z)
-         - data-acao: o que faz (cena, url, whatsapp, email)
-         - data-valor: para onde vai (cena-01, https://...)
-         - data-cena-origem: de qual cena este botão veio (cena-00)
-         - Cor do material
-         - Texto do botão (value)
-    -->
-    
-    <!-- EXEMPLO DE BOTÃO 1 - Vai para outra cena -->
+    <!-- ====== BOTÕES (OPCIONAL) ========= -->
+    <!-- Exemplo de botão -->
     <a-entity class="clickable botao"
               geometry="primitive: sphere; radius: 0.1"
-              material="color: #ff4444; emissive: #440000;"
+              material="color: #ff4444;"
               position="0.3 0.2 0.4"
-              scale="0.7 0.7 0.7"
               data-acao="cena"
-              data-valor="cena-01"        <!-- Para qual cena -->
-              data-cena-origem="cena-00"   <!-- De onde veio -->
-              visible="false">             <!-- Não mexer -->
-      
-      <!-- Texto do botão (mude o texto) -->
-      <a-entity text="value: 01; color: white; align: center; width: 2"
-                position="0 0.15 0"
-                scale="0.3 0.3 0.3">
-      </a-entity>
-      
-      <!-- Animação de flutuação (opcional) -->
-      <a-animation attribute="position"
-                   from="0.3 0.2 0.4"
-                   to="0.3 0.27 0.4"
-                   dur="1000"
-                   direction="alternate"
-                   repeat="indefinite">
-      </a-animation>
-    </a-entity>
-
-    <!-- EXEMPLO DE BOTÃO 2 - Abre URL -->
-    <a-entity class="clickable botao"
-              geometry="primitive: sphere; radius: 0.1"
-              material="color: #44ff44; emissive: #004400;"
-              position="-0.3 0.2 0.4"
-              scale="0.7 0.7 0.7"
-              data-acao="url"
-              data-valor="https://google.com"  <!-- URL -->
+              data-valor="cena-01"
               data-cena-origem="cena-00"
               visible="false">
-      
-      <a-entity text="value: 🌐; color: white; align: center; width: 2"
-                position="0 0.15 0"
-                scale="0.3 0.3 0.3">
-      </a-entity>
+        <a-entity text="value: 01; color: white; align: center;"
+                  position="0 0.15 0"
+                  scale="0.3 0.3 0.3">
+        </a-entity>
     </a-entity>
 
-    <!-- EXEMPLO DE BOTÃO 3 - WhatsApp -->
-    <a-entity class="clickable botao"
-              geometry="primitive: sphere; radius: 0.1"
-              material="color: #25D366; emissive: #004400;"
-              position="0 0.2 0.4"
-              scale="0.7 0.7 0.7"
-              data-acao="whatsapp"
-              data-valor="https://wa.me/5511999999999"
-              data-cena-origem="cena-00"
-              visible="false">
-      
-      <a-entity text="value: 📱; color: white; align: center; width: 2"
-                position="0 0.15 0"
-                scale="0.3 0.3 0.3">
-      </a-entity>
-    </a-entity>
-
-    <!-- EXEMPLO DE BOTÃO 4 - Email -->
-    <a-entity class="clickable botao"
-              geometry="primitive: sphere; radius: 0.1"
-              material="color: #ffaa44; emissive: #442200;"
-              position="0.6 0.2 0.4"
-              scale="0.7 0.7 0.7"
-              data-acao="email"
-              data-valor="mailto:contato@email.com"
-              data-cena-origem="cena-00"
-              visible="false">
-      
-      <a-entity text="value: ✉️; color: white; align: center; width: 2"
-                position="0 0.15 0"
-                scale="0.3 0.3 0.3">
-      </a-entity>
-    </a-entity>
-
-  </a-entity>
+</a-entity>  ← FECHA O BLOCO DA CENA
   <!-- ===== FIM DO BLOCO DA CENA 00 ===== -->
 
 
@@ -644,4 +557,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </body>
 </html>
+
 
