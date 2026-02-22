@@ -2,7 +2,7 @@
 <html>
 <head>
    <script>
-const VERSION = "1.0.0"; 
+const VERSION = "7.1.0"; 
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -23,7 +23,6 @@ body { margin:0; overflow:hidden; }
   cursor: pointer;
   border: 2px solid white;
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  transition: all 0.3s ease;
   font-size: 24px;
   display: flex;
   align-items: center;
@@ -41,15 +40,33 @@ body { margin:0; overflow:hidden; }
   top: auto !important;
   transform: none !important;
 }
+/* Debug - mostra status */
+#debug-status {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(0,0,0,0.7);
+  color: #00ff88;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 10000;
+  font-family: monospace;
+  font-size: 12px;
+}
 </style>
 </head>
 
 <body>
 
+<!-- Debug status -->
+<div id="debug-status">📡 Inicializando...</div>
+
 <a-scene
-  mindar-image="imageTargetSrc: targets.mind;"
+  mindar-image="imageTargetSrc: Target01.mind; autoStart: true;" <!-- Use UM arquivo .mind -->
   vr-mode-ui="enabled: false"
-  device-orientation-permission-ui="enabled: false">
+  device-orientation-permission-ui="enabled: false"
+  embedded
+  arjs="sourceType: webcam; debugUIEnabled: false;">
 
   <a-camera position="0 0 0" look-controls="enabled: false">
     <a-entity cursor="fuse: false; rayOrigin: mouse"
@@ -59,278 +76,69 @@ body { margin:0; overflow:hidden; }
     </a-entity>
   </a-camera>
 
- <!-- ========================================= -->
-<!-- BLOCO DE CENA 0 - TARGET 0                -->
-<!-- ========================================= -->
-<a-entity mindar-image-target="targetIndex: 0" id="cena-00" class="cena">
-
-    <!-- ====== MODELO 3D ========= -->
-    <a-entity
-        id="modelo-cena00"
-        gltf-model="BonnyCaminha.glbl"  <!-- ou deixe vazio "" se não usar -->
-        animation-mixer="clip: ; loop: repeat;"  <!-- coloque o nome da animação -->
-        position="0 0 0.3"
-        rotation="-90 0 0"
-        scale="0.7 0.7 0.7"
-        visible="false">
-    </a-entity>  ← A TAG FECHA AQUI CORRETAMENTE
-
-    <!-- ====== ÁUDIO ========= -->
-    <audio id="audio-cena00" preload="auto" loop style="display: none;">
-        <source src="Moo.mp3" type="audio/mpeg">  <!-- ou deixe vazio "" -->
-    </audio>
-
-    <!-- ====== VÍDEO ========= -->
-    <video id="video-cena00" preload="auto" loop style="display: none;" crossorigin="anonymous">
-        <source src="Video Antecipe Portugues 1.mp4" type="video/mp4">  <!-- ou deixe vazio "" -->
-    </video>
-
-    <!-- ====== TELA DO VÍDEO ========= -->
-    <a-entity
-        id="video-screen-cena00"
-        geometry="primitive: plane; width: 1; height: 0.56"
-        material="shader: flat; src: #video-cena00; transparent: true;"
-        position="0 0 0.3"
-        rotation="-90 0 0"
-        scale="0.7 0.7 0.7"
-        visible="false">
-    </a-entity>
-
-    <!-- ====== BOTÕES (OPCIONAL) ========= -->
-    <!-- Exemplo de botão -->
-    <a-entity class="clickable botao"
-              geometry="primitive: sphere; radius: 0.1"
-              material="color: #ff4444;"
-              position="0.3 0.2 0.4"
-              data-acao="cena"
-              data-valor="cena-01"
-              data-cena-origem="cena-00"
-              visible="false">
-        <a-entity text="value: 01; color: white; align: center;"
-                  position="0 0.15 0"
-                  scale="0.3 0.3 0.3">
-        </a-entity>
-    </a-entity>
-
-</a-entity>  ← FECHA O BLOCO DA CENA
-  <!-- ===== FIM DO BLOCO DA CENA 00 ===== -->
-
-
   <!-- ========================================= -->
-  <!-- BLOCO DE CENA 01 - TARGET 1                  -->
+  <!-- BLOCO DE CENA 0 - TARGET 0                -->
   <!-- ========================================= -->
-    <a-entity mindar-image-target="targetIndex: 0" id="cena-01" class="cena">
-       
-   <!-- ========== MODELO 3D ========== -->
-    <!-- Coloque o nome do arquivo .glb ou deixe vazio -->
-    <a-entity
-      id="modelo-cena01"
-      gltf-model="Cena 01Teste.glb"        <!-- Ex: "mascote.glb" -->
-      animation-mixer="clip: ; loop: repeat;"  <!-- Ex: "fala" -->
-      position="0 0 0.3"
-      rotation="-90 0 0"
-      scale="0.7 0.7 0.7"
-      visible="false">     <!-- Não mexer -->
-    </a-entity>
-    
-    <!-- ========== ÁUDIO ========== -->
-    <!-- Coloque o nome do arquivo .mp3 ou deixe vazio -->
-    <audio id="audio-cena00" preload="auto" loop style="display: none;">
-      <source src="" type="Chuva02.mp3">  <!-- Ex: "musica.mp3" -->
-    </audio>
-    
-    <!-- ========== VÍDEO ========== -->
-    <!-- Coloque o nome do arquivo .mp4 ou deixe vazio -->
-    <video id="video-cena00" preload="auto" loop style="display: none;" crossorigin="anonymous">
-      <source src="" type="video/mp4">  <!-- Ex: "video.mp4" -->
-    </video>
-    
-    <!-- Tela do vídeo (aparece automaticamente se tiver vídeo) -->
-    <a-entity
-      id="video-screen-cena00"
-      geometry="primitive: plane; width: 1; height: 0.56"
-      material="shader: flat; src: #video-cena00; transparent: true;"
-      position="0 0 0.3"
-      rotation="-90 0 0"
-      scale="0.7 0.7 0.7"
-      visible="false">     <!-- Não mexer -->
-    </a-entity>
-
-    <!-- ========== BOTÕES ========== -->
-    <!-- 
-      COMO USAR:
-      1. Copie o bloco <a-entity class="clickable botao"> abaixo
-      2. Cole quantos botões quiser
-      3. Preencha os dados:
-         - position: onde o botão aparece (x y z)
-         - data-acao: o que faz (cena, url, whatsapp, email)
-         - data-valor: para onde vai (cena-01, https://...)
-         - data-cena-origem: de qual cena este botão veio (cena-00)
-         - Cor do material
-         - Texto do botão (value)
-    -->
-    
-    <!-- EXEMPLO DE BOTÃO 1 - Vai para outra cena -->
-    <a-entity class="clickable botao"
-              geometry="primitive: sphere; radius: 0.1"
-              material="color: #ff4444; emissive: #440000;"
-              position="0.3 0.2 0.4"
-              scale="0.7 0.7 0.7"
-              data-acao="cena"
-              data-valor="cena-01"        <!-- Para qual cena -->
-              data-cena-origem="cena-00"   <!-- De onde veio -->
-              visible="false">             <!-- Não mexer -->
-      
-      <!-- Texto do botão (mude o texto) -->
-      <a-entity text="value: 01; color: white; align: center; width: 2"
-                position="0 0.15 0"
-                scale="0.3 0.3 0.3">
-      </a-entity>
-      
-      <!-- Animação de flutuação (opcional) -->
-      <a-animation attribute="position"
-                   from="0.3 0.2 0.4"
-                   to="0.3 0.27 0.4"
-                   dur="1000"
-                   direction="alternate"
-                   repeat="indefinite">
-      </a-animation>
-    </a-entity>
-
-    <!-- EXEMPLO DE BOTÃO 2 - Abre URL -->
-    <a-entity class="clickable botao"
-              geometry="primitive: sphere; radius: 0.1"
-              material="color: #44ff44; emissive: #004400;"
-              position="-0.3 0.2 0.4"
-              scale="0.7 0.7 0.7"
-              data-acao="url"
-              data-valor="https://google.com"  <!-- URL -->
-              data-cena-origem="cena-00"
-              visible="false">
-      
-      <a-entity text="value: 🌐; color: white; align: center; width: 2"
-                position="0 0.15 0"
-                scale="0.3 0.3 0.3">
-      </a-entity>
-    </a-entity>
-
-    <!-- EXEMPLO DE BOTÃO 3 - WhatsApp -->
-    <a-entity class="clickable botao"
-              geometry="primitive: sphere; radius: 0.1"
-              material="color: #25D366; emissive: #004400;"
-              position="0 0.2 0.4"
-              scale="0.7 0.7 0.7"
-              data-acao="whatsapp"
-              data-valor="https://wa.me/5511999999999"
-              data-cena-origem="cena-00"
-              visible="false">
-      
-      <a-entity text="value: 📱; color: white; align: center; width: 2"
-                position="0 0.15 0"
-                scale="0.3 0.3 0.3">
-      </a-entity>
-    </a-entity>
-
-    <!-- EXEMPLO DE BOTÃO 4 - Email -->
-    <a-entity class="clickable botao"
-              geometry="primitive: sphere; radius: 0.1"
-              material="color: #ffaa44; emissive: #442200;"
-              position="0.6 0.2 0.4"
-              scale="0.7 0.7 0.7"
-              data-acao="email"
-              data-valor="mailto:contato@email.com"
-              data-cena-origem="cena-00"
-              visible="false">
-      
-      <a-entity text="value: ✉️; color: white; align: center; width: 2"
-                position="0 0.15 0"
-                scale="0.3 0.3 0.3">
-      </a-entity>
-    </a-entity>
-
-  </a-entity>
-  <!-- DEPOIS MUDE targetIndex="1" E id="cena-01" -->
-  <a-entity mindar-image-target="targetIndex: 1" id="cena-01" class="cena">
+  <a-entity mindar-image-target="targetIndex: 0" id="cena-00" class="cena">
     
     <!-- MODELO 3D -->
     <a-entity
-      id="modelo-cena01"
-      gltf-model=""        <!-- EX: "Cana 01Teste.glb" -->
+      id="modelo-cena00"
+      gltf-model="BonnyCaminha.glbl"
       animation-mixer="clip: ; loop: repeat;"
       position="0 0 0.3"
       rotation="-90 0 0"
       scale="0.7 0.7 0.7"
-      visible="false">
+      visible="true">  <!-- Começa visível para teste -->
     </a-entity>
     
     <!-- ÁUDIO -->
-    <audio id="audio-cena01" preload="auto" loop style="display: none;">
-      <source src="" type="audio/mpeg">  <!-- EX: "chuva.mp3" -->
+    <audio id="audio-cena00" preload="auto" loop>
+      <source src="Moo.mp3" type="audio/mpeg">
     </audio>
+
+  </a-entity>
+
+  <!-- ========================================= -->
+  <!-- BLOCO DE CENA 1 - TARGET 1                -->
+  <!-- ========================================= -->
+  <a-entity mindar-image-target="targetIndex: 1" id="cena-01" class="cena">
     
-    <!-- VÍDEO -->
-    <video id="video-cena01" preload="auto" loop style="display: none;" crossorigin="anonymous">
-      <source src="" type="video/mp4">
-    </video>
-    
-    <!-- Tela do vídeo -->
     <a-entity
-      id="Video"
-      geometry="primitive: plane; width: 1; height: 0.56"
-      material="shader: flat; src: #video-cena01; transparent: true;"
+      id="modelo-cena01"
+      gltf-model="Cena 01Teste.glbl"
+      animation-mixer="clip: ; loop: repeat;"
       position="0 0 0.3"
       rotation="-90 0 0"
       scale="0.7 0.7 0.7"
-      visible="false">
+      visible="true">
     </a-entity>
-
-    <!-- BOTÕES - COLOQUE SEUS BOTÕES AQUI -->
     
-    <!-- Botão para voltar à CENA 00 -->
-    <a-entity class="clickable botao"
-              geometry="primitive: sphere; radius: 0.1"
-              material="color: #ffff44; emissive: #444400;"
-              position="0.3 0.2 0.4"
-              scale="0.7 0.7 0.7"
-              data-acao="cena"
-              data-valor="cena-00"
-              data-cena-origem="cena-01"
-              visible="false">
-      
-      <a-entity text="value: 🔙; color: black; align: center; width: 2"
-                position="0 0.15 0"
-                scale="0.3 0.3 0.3">
-      </a-entity>
-    </a-entity>
+    <audio id="audio-cena01" preload="auto" loop>
+      <source src="Passaros.mp3" type="audio/mpeg">
+    </audio>
 
   </a-entity>
 
   <!-- ========================================= -->
-  <!-- BLOCO DE CENA - TARGET 2                  -->
+  <!-- BLOCO DE CENA 2 - TARGET 2                -->
   <!-- ========================================= -->
   <a-entity mindar-image-target="targetIndex: 2" id="cena-02" class="cena">
-    <!-- COPIE O MODELO AQUI E PREENCHA -->
-  </a-entity>
+    
+    <a-entity
+      id="modelo-cena02"
+      gltf-model="MascoteDanca.glbl"
+      animation-mixer="clip: ; loop: repeat;"
+      position="0 0 0.3"
+      rotation="-90 0 0"
+      scale="0.7 0.7 0.7"
+      visible="true">
+    </a-entity>
+    
+    <audio id="audio-cena02" preload="auto" loop>
+      <source src="Chuva02.mp3" type="audio/mpeg">
+    </audio>
 
-  <!-- ========================================= -->
-  <!-- BLOCO DE CENA - TARGET 3                  -->
-  <!-- ========================================= -->
-  <a-entity mindar-image-target="targetIndex: 3" id="cena-03" class="cena">
-    <!-- COPIE O MODELO AQUI E PREENCHA -->
-  </a-entity>
-
-  <!-- ========================================= -->
-  <!-- BLOCO DE CENA - TARGET 4                  -->
-  <!-- ========================================= -->
-  <a-entity mindar-image-target="targetIndex: 4" id="cena-04" class="cena">
-    <!-- COPIE O MODELO AQUI E PREENCHA -->
-  </a-entity>
-
-  <!-- ========================================= -->
-  <!-- BLOCO DE CENA - TARGET 5                  -->
-  <!-- ========================================= -->
-  <a-entity mindar-image-target="targetIndex: 5" id="cena-05" class="cena">
-    <!-- COPIE O MODELO AQUI E PREENCHA -->
   </a-entity>
 
 </a-scene>
@@ -339,223 +147,87 @@ body { margin:0; overflow:hidden; }
 <button class="audio-control-btn paused" id="audioBtn">🔇</button>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
   
-  // ============================================
-  // SISTEMA DE GERENCIAMENTO (NÃO PRECISA MEXER)
-  // ============================================
-  
-  // Coletar todas as cenas disponíveis
-  const cenas = [];
-  document.querySelectorAll('.cena').forEach(cena => {
-    cenas.push(cena.id);
-  });
-
-  // Estado de cada cena
-  const estadoCenas = {};
-  cenas.forEach(cenaId => {
-    estadoCenas[cenaId] = {
-      tempoAudio: 0,
-      tempoVideo: 0,
-      ativa: false
-    };
-  });
-
-  let cenaAtual = null;
-  let mediaUnlocked = false;
+  const debug = document.getElementById('debug-status');
   const audioBtn = document.getElementById('audioBtn');
-
+  
   // ============================================
-  // FUNÇÃO PARA ATIVAR UMA CENA
+  // TESTE 1: Verificar se os elementos existem
   // ============================================
-  window.ativarCena = function(cenaId) {
-    console.log('🎬 Ativando:', cenaId);
-    
-    // Desativar cena atual
-    if (cenaAtual && cenaAtual !== cenaId) {
-      desativarCena(cenaAtual);
-    }
-    
-    const cenaEl = document.getElementById(cenaId);
-    if (!cenaEl) return;
-    
-    // ATIVAR MODELO 3D
-    const modelo = cenaEl.querySelector('[gltf-model]');
-    if (modelo && modelo.getAttribute('gltf-model')) {
-      modelo.setAttribute('visible', 'true');
-      modelo.setAttribute('animation-mixer', 'timeScale', 1);
-    }
-    
-    // ATIVAR VÍDEO
-    const video = document.getElementById(`video-${cenaId}`);
-    const tela = document.getElementById(`video-screen-${cenaId}`);
-    if (video && video.querySelector('source').src && tela) {
-      video.currentTime = estadoCenas[cenaId].tempoVideo;
-      tela.setAttribute('visible', 'true');
-      if (mediaUnlocked) {
-        video.play().catch(() => {});
-      }
-    }
-    
-    // ATIVAR ÁUDIO
-    const audio = document.getElementById(`audio-${cenaId}`);
-    if (audio && audio.querySelector('source').src) {
-      audio.currentTime = estadoCenas[cenaId].tempoAudio;
-      if (mediaUnlocked) {
-        audio.play().catch(() => {});
-      }
-    }
-    
-    // ATIVAR BOTÕES
-    cenaEl.querySelectorAll('.botao').forEach(btn => {
-      if (btn.getAttribute('data-acao')) { // Só mostra se tiver ação configurada
-        btn.setAttribute('visible', 'true');
-      }
-    });
-    
-    estadoCenas[cenaId].ativa = true;
-    cenaAtual = cenaId;
-    atualizarBotaoAudio();
-  };
-
-  // ============================================
-  // FUNÇÃO PARA DESATIVAR UMA CENA
-  // ============================================
-  function desativarCena(cenaId) {
-    const cenaEl = document.getElementById(cenaId);
-    if (!cenaEl) return;
-    
-    // SALVAR TEMPO DO ÁUDIO
-    const audio = document.getElementById(`audio-${cenaId}`);
-    if (audio) {
-      estadoCenas[cenaId].tempoAudio = audio.currentTime;
-      audio.pause();
-    }
-    
-    // SALVAR TEMPO DO VÍDEO
-    const video = document.getElementById(`video-${cenaId}`);
-    if (video) {
-      estadoCenas[cenaId].tempoVideo = video.currentTime;
-      video.pause();
-    }
-    
-    // PAUSAR ANIMAÇÃO
-    const modelo = cenaEl.querySelector('[gltf-model]');
-    if (modelo) {
-      modelo.setAttribute('animation-mixer', 'timeScale', 0);
-    }
-    
-    // ESCONDER TUDO
-    cenaEl.querySelectorAll('[visible="true"]').forEach(el => {
-      if (el.id !== cenaId) {
-        el.setAttribute('visible', 'false');
-      }
-    });
-    
-    estadoCenas[cenaId].ativa = false;
+  debug.innerHTML = "🔍 Verificando elementos...";
+  
+  const scene = document.querySelector('a-scene');
+  if (scene) {
+    debug.innerHTML = "✅ Scene carregada";
+  } else {
+    debug.innerHTML = "❌ Scene não encontrada";
+    return;
   }
-
+  
   // ============================================
-  // DETECTAR TARGETS
+  // TESTE 2: Verificar MindAR
   // ============================================
-  document.querySelectorAll('.cena').forEach(cena => {
-    cena.addEventListener("targetFound", () => {
-      ativarCena(cena.id);
-    });
-
-    cena.addEventListener("targetLost", () => {
-      if (cenaAtual === cena.id) {
-        desativarCena(cena.id);
-        cenaAtual = null;
-        atualizarBotaoAudio();
-      }
-    });
+  scene.addEventListener('mindar-image-ready', () => {
+    debug.innerHTML = "🎯 MindAR pronto - Aguardando targets...";
+  });
+  
+  scene.addEventListener('mindar-image-target-found', (e) => {
+    debug.innerHTML = `✅ Target encontrado: ${e.detail.targetIndex}`;
+    console.log('Target encontrado:', e.detail);
+  });
+  
+  scene.addEventListener('mindar-image-target-lost', (e) => {
+    debug.innerHTML = `❌ Target perdido: ${e.detail.targetIndex}`;
   });
 
   // ============================================
-  // BOTÕES DE AÇÃO
+  // TESTE 3: Verificar cada target individualmente
   // ============================================
-  document.querySelectorAll('.botao').forEach(botao => {
-    botao.addEventListener('click', function(e) {
-      e.stopPropagation();
+  const cenas = document.querySelectorAll('.cena');
+  cenas.forEach((cena, index) => {
+    cena.addEventListener('targetFound', () => {
+      debug.innerHTML = `🎯 CENA ${index} ATIVADA!`;
+      console.log(`Cena ${index} ativada`);
       
-      const acao = this.getAttribute('data-acao');
-      const valor = this.getAttribute('data-valor');
-      const cenaOrigem = this.getAttribute('data-cena-origem');
-      
-      console.log(`👆 Ação: ${acao} → ${valor}`);
-      
-      // Feedback visual
-      this.setAttribute('material', 'emissive', '#ffffff');
-      setTimeout(() => {
-        this.setAttribute('material', 'emissive', this.getAttribute('material').emissive);
-      }, 200);
-      
-      // Processar ação
-      switch(acao) {
-        case 'cena':
-          // Salvar estado da cena atual
-          if (cenaOrigem) {
-            const audio = document.getElementById(`audio-${cenaOrigem}`);
-            if (audio) estadoCenas[cenaOrigem].tempoAudio = audio.currentTime;
-            const video = document.getElementById(`video-${cenaOrigem}`);
-            if (video) estadoCenas[cenaOrigem].tempoVideo = video.currentTime;
-          }
-          // Ativar nova cena
-          ativarCena(valor);
-          break;
-          
-        case 'url':
-        case 'whatsapp':
-        case 'email':
-          window.open(valor, '_blank');
-          break;
+      // Tocar áudio da cena
+      const audio = document.getElementById(`audio-cena0${index}`);
+      if (audio) {
+        audio.play().catch(e => console.log('Áudio bloqueado:', e));
       }
     });
-  });
-
-  // ============================================
-  // BOTÃO DE ÁUDIO GLOBAL
-  // ============================================
-  function atualizarBotaoAudio() {
-    const tocando = Object.values(estadoCenas).some(e => e.ativa);
-    audioBtn.innerHTML = tocando ? '🔊' : '🔇';
-    audioBtn.className = `audio-control-btn ${tocando ? 'playing' : 'paused'}`;
-  }
-
-  audioBtn.addEventListener('click', function() {
-    if (!mediaUnlocked) {
-      mediaUnlocked = true;
-      document.querySelectorAll('audio, video').forEach(m => {
-        m.play().then(() => m.pause()).catch(() => {});
-      });
-    }
     
-    if (cenaAtual) {
-      if (estadoCenas[cenaAtual].ativa) {
-        desativarCena(cenaAtual);
-      } else {
-        ativarCena(cenaAtual);
+    cena.addEventListener('targetLost', () => {
+      debug.innerHTML = `👋 CENA ${index} perdida`;
+      console.log(`Cena ${index} perdida`);
+      
+      const audio = document.getElementById(`audio-cena0${index}`);
+      if (audio) {
+        audio.pause();
       }
-    }
+    });
   });
 
-  // Desbloquear mídia no primeiro clique
-  document.body.addEventListener('click', function unlock() {
-    if (!mediaUnlocked) {
-      mediaUnlocked = true;
-      document.querySelectorAll('audio, video').forEach(m => {
-        m.play().then(() => m.pause()).catch(() => {});
-      });
-    }
-  }, { once: true });
+  // ============================================
+  // Botão de áudio
+  // ============================================
+  audioBtn.addEventListener('click', () => {
+    // Desbloquear áudio
+    document.querySelectorAll('audio').forEach(audio => {
+      audio.play().then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+      }).catch(e => console.log('Erro ao desbloquear:', e));
+    });
+    
+    audioBtn.classList.toggle('playing');
+    audioBtn.classList.toggle('paused');
+    audioBtn.innerHTML = audioBtn.classList.contains('playing') ? '🔊' : '🔇';
+  });
 
-  console.log('🚀 Sistema de blocos genéricos pronto!');
-  console.log('📋 Cenas disponíveis:', cenas);
+  console.log('🚀 Sistema iniciado');
 });
 </script>
 
 </body>
 </html>
-
-
