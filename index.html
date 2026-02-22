@@ -60,7 +60,7 @@ body { margin:0; overflow:hidden; }
   </a-camera>
 
   <!-- ========================================= -->
-  <!-- BLOCO DE CENA - TARGET 0                  -->
+  <!-- BLOCO DE CENA 0 - TARGET 0                  -->
   <!-- ========================================= -->
   <!-- 
     INSTRUÇÕES:
@@ -88,6 +88,142 @@ body { margin:0; overflow:hidden; }
     <!-- Coloque o nome do arquivo .mp3 ou deixe vazio -->
     <audio id="audio-cena00" preload="auto" loop style="display: none;">
       <source src="" type="audio/mpeg">  <!-- Ex: "musica.mp3" -->
+    </audio>
+    
+    <!-- ========== VÍDEO ========== -->
+    <!-- Coloque o nome do arquivo .mp4 ou deixe vazio -->
+    <video id="video-cena00" preload="auto" loop style="display: none;" crossorigin="anonymous">
+      <source src="" type="VideoAntecipePortugues1.mp4">  <!-- Ex: "video.mp4" -->
+    </video>
+    
+    <!-- Tela do vídeo (aparece automaticamente se tiver vídeo) -->
+    <a-entity
+      id="video-screen-cena00"
+      geometry="primitive: plane; width: 1; height: 0.56"
+      material="shader: flat; src: #video-cena00; transparent: true;"
+      position="0 0 0.3"
+      rotation="-90 0 0"
+      scale="0.7 0.7 0.7"
+      visible="false">     <!-- Não mexer -->
+    </a-entity>
+
+    <!-- ========== BOTÕES ========== -->
+    <!-- 
+      COMO USAR:
+      1. Copie o bloco <a-entity class="clickable botao"> abaixo
+      2. Cole quantos botões quiser
+      3. Preencha os dados:
+         - position: onde o botão aparece (x y z)
+         - data-acao: o que faz (cena, url, whatsapp, email)
+         - data-valor: para onde vai (cena-01, https://...)
+         - data-cena-origem: de qual cena este botão veio (cena-00)
+         - Cor do material
+         - Texto do botão (value)
+    -->
+    
+    <!-- EXEMPLO DE BOTÃO 1 - Vai para outra cena -->
+    <a-entity class="clickable botao"
+              geometry="primitive: sphere; radius: 0.1"
+              material="color: #ff4444; emissive: #440000;"
+              position="0.3 0.2 0.4"
+              scale="0.7 0.7 0.7"
+              data-acao="cena"
+              data-valor="cena-01"        <!-- Para qual cena -->
+              data-cena-origem="cena-00"   <!-- De onde veio -->
+              visible="false">             <!-- Não mexer -->
+      
+      <!-- Texto do botão (mude o texto) -->
+      <a-entity text="value: 01; color: white; align: center; width: 2"
+                position="0 0.15 0"
+                scale="0.3 0.3 0.3">
+      </a-entity>
+      
+      <!-- Animação de flutuação (opcional) -->
+      <a-animation attribute="position"
+                   from="0.3 0.2 0.4"
+                   to="0.3 0.27 0.4"
+                   dur="1000"
+                   direction="alternate"
+                   repeat="indefinite">
+      </a-animation>
+    </a-entity>
+
+    <!-- EXEMPLO DE BOTÃO 2 - Abre URL -->
+    <a-entity class="clickable botao"
+              geometry="primitive: sphere; radius: 0.1"
+              material="color: #44ff44; emissive: #004400;"
+              position="-0.3 0.2 0.4"
+              scale="0.7 0.7 0.7"
+              data-acao="url"
+              data-valor="https://google.com"  <!-- URL -->
+              data-cena-origem="cena-00"
+              visible="false">
+      
+      <a-entity text="value: 🌐; color: white; align: center; width: 2"
+                position="0 0.15 0"
+                scale="0.3 0.3 0.3">
+      </a-entity>
+    </a-entity>
+
+    <!-- EXEMPLO DE BOTÃO 3 - WhatsApp -->
+    <a-entity class="clickable botao"
+              geometry="primitive: sphere; radius: 0.1"
+              material="color: #25D366; emissive: #004400;"
+              position="0 0.2 0.4"
+              scale="0.7 0.7 0.7"
+              data-acao="whatsapp"
+              data-valor="https://wa.me/5511999999999"
+              data-cena-origem="cena-00"
+              visible="false">
+      
+      <a-entity text="value: 📱; color: white; align: center; width: 2"
+                position="0 0.15 0"
+                scale="0.3 0.3 0.3">
+      </a-entity>
+    </a-entity>
+
+    <!-- EXEMPLO DE BOTÃO 4 - Email -->
+    <a-entity class="clickable botao"
+              geometry="primitive: sphere; radius: 0.1"
+              material="color: #ffaa44; emissive: #442200;"
+              position="0.6 0.2 0.4"
+              scale="0.7 0.7 0.7"
+              data-acao="email"
+              data-valor="mailto:contato@email.com"
+              data-cena-origem="cena-00"
+              visible="false">
+      
+      <a-entity text="value: ✉️; color: white; align: center; width: 2"
+                position="0 0.15 0"
+                scale="0.3 0.3 0.3">
+      </a-entity>
+    </a-entity>
+
+  </a-entity>
+  <!-- ===== FIM DO BLOCO DA CENA 00 ===== -->
+
+
+  <!-- ========================================= -->
+  <!-- BLOCO DE CENA 01 - TARGET 1                  -->
+  <!-- ========================================= -->
+    <a-entity mindar-image-target="targetIndex: 0" id="cena-01" class="cena">
+       
+   <!-- ========== MODELO 3D ========== -->
+    <!-- Coloque o nome do arquivo .glb ou deixe vazio -->
+    <a-entity
+      id="modelo-cena01"
+      gltf-model="Cena 01Teste.glb"        <!-- Ex: "mascote.glb" -->
+      animation-mixer="clip: ; loop: repeat;"  <!-- Ex: "fala" -->
+      position="0 0 0.3"
+      rotation="-90 0 0"
+      scale="0.7 0.7 0.7"
+      visible="false">     <!-- Não mexer -->
+    </a-entity>
+    
+    <!-- ========== ÁUDIO ========== -->
+    <!-- Coloque o nome do arquivo .mp3 ou deixe vazio -->
+    <audio id="audio-cena00" preload="auto" loop style="display: none;">
+      <source src="" type="Chuva02.mp3">  <!-- Ex: "musica.mp3" -->
     </audio>
     
     <!-- ========== VÍDEO ========== -->
@@ -200,20 +336,13 @@ body { margin:0; overflow:hidden; }
     </a-entity>
 
   </a-entity>
-  <!-- ===== FIM DO BLOCO DA CENA 00 ===== -->
-
-
-  <!-- ========================================= -->
-  <!-- BLOCO DE CENA - TARGET 1                  -->
-  <!-- ========================================= -->
-  <!-- COPIE O BLOCO ACIMA E COLE AQUI -->
   <!-- DEPOIS MUDE targetIndex="1" E id="cena-01" -->
   <a-entity mindar-image-target="targetIndex: 1" id="cena-01" class="cena">
     
     <!-- MODELO 3D -->
     <a-entity
       id="modelo-cena01"
-      gltf-model=""        <!-- EX: "milho-chuva.glb" -->
+      gltf-model=""        <!-- EX: "Cana 01Teste.glb" -->
       animation-mixer="clip: ; loop: repeat;"
       position="0 0 0.3"
       rotation="-90 0 0"
@@ -233,7 +362,7 @@ body { margin:0; overflow:hidden; }
     
     <!-- Tela do vídeo -->
     <a-entity
-      id="video-screen-cena01"
+      id="Video"
       geometry="primitive: plane; width: 1; height: 0.56"
       material="shader: flat; src: #video-cena01; transparent: true;"
       position="0 0 0.3"
@@ -515,3 +644,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </body>
 </html>
+
