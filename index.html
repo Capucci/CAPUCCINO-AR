@@ -3,15 +3,22 @@
 <head>
    <script>
 const VERSION = "1.0.0"; 
+// ↑ SEMPRE que atualizar modelo/vídeo ou target,
+// só mude esse número
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+
+<!-- NECESSÁRIO PARA ANIMAÇÃO -->
 <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
 <style>
 body { margin:0; overflow:hidden; }
+
+/* Botão simplificado no canto inferior esquerdo */
 .audio-control-btn {
   position: fixed;
   bottom: 20px;
@@ -30,9 +37,20 @@ body { margin:0; overflow:hidden; }
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.7);
 }
-.audio-control-btn.playing { background-color: rgba(0, 128, 0, 0.8); }
-.audio-control-btn.paused { background-color: rgba(255, 0, 0, 0.8); }
-.audio-control-btn:hover { transform: scale(1.1); }
+
+.audio-control-btn.playing {
+  background-color: rgba(0, 128, 0, 0.8);
+}
+
+.audio-control-btn.paused {
+  background-color: rgba(255, 0, 0, 0.8);
+}
+
+.audio-control-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Botão de VR no canto inferior direito */
 .a-enter-vr {
   position: fixed;
   bottom: 20px !important;
@@ -42,222 +60,181 @@ body { margin:0; overflow:hidden; }
   transform: none !important;
 }
 </style>
+
 </head>
 
 <body>
 
 <a-scene
-  mindar-image="imageTargetSrc: Target01.mind;"  <!-- USANDO Target01.mind -->
+  mindar-image="imageTargetSrc: Target01.mind;"
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false">
 
   <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-  <!-- ========================================= -->
-  <!-- TARGET 0 - Modelo 3D (primeira imagem)    -->
-  <!-- ========================================= -->
-  <a-entity mindar-image-target="targetIndex: 0" id="target-modelo">
+  <a-entity mindar-image-target="targetIndex: 0" id="target-principal">
 
-    <!-- MODELO 3D -->
+    <!-- MODELO 3D (lado esquerdo) -->
     <a-entity
       id="mascote"
-      gltf-model="MascoteDanca.glb"
+      gltf-model="Cena 01Teste.glb"
       animation-mixer
-      position="0 0 0.3"
+      position="-0.8 0 0.3"
       rotation="-90 0 0"
       scale="0.7 0.7 0.7">
     </a-entity>
 
-  </a-entity>
-
-  <!-- ========================================= -->
-  <!-- TARGET 1 - VÍDEO (segunda imagem)         -->
-  <!-- ========================================= -->
-  <a-entity mindar-image-target="targetIndex: 1" id="target-video">
-
-    <!-- TELA DE VÍDEO -->
-    <a-entity
-      id="tela-video"
-      geometry="primitive: plane; width: 1; height: 0.56"
-      material="shader: flat; src: #meuVideo; transparent: true;"
-      position="0 0 0.3"
+    <!-- VÍDEO (lado direito) -->
+    <a-video
+      id="video-mascote"
+      src="Video Antecipe Portugues 1.mp4"
+      position="0.8 0 0.3"
       rotation="-90 0 0"
-      scale="0.7 0.7 0.7">
-    </a-entity>
-
-    <!-- VÍDEO (escondido) -->
-    <video id="meuVideo" preload="auto" loop style="display: none;" crossorigin="anonymous">
-      <source src="Video Antecipe Portugues 1.mp4" type="video/mp4">
-    </video>
+      width="1.2"
+      height="0.8">
+    </a-video>
 
   </a-entity>
 
-  <!-- ÁUDIO do modelo -->
-  <audio id="audioMascote" preload="auto" style="display: none;" loop="false">
-    <source src="AudioTrack11.mp3" type="audio/mpeg">
-  </audio>
+  <!-- Elemento de vídeo HTML5 escondido (com áudio incluso) -->
+  <video id="meuVideo" preload="auto" loop="false" crossorigin="anonymous" style="display: none;">
+    <source src="SeuVideo.mp4" type="video/mp4">
+    <!-- Substitua "SeuVideo.mp4" pelo caminho correto do seu arquivo de vídeo -->
+  </video>
 
   <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-  // Elementos
-  const targetModelo = document.querySelector('#target-modelo');
-  const targetVideo = document.querySelector('#target-video');
-  const audioElement = document.querySelector('#audioMascote');
+  const target = document.querySelector('#target-principal');
+  
+  // Referência direta ao elemento de vídeo HTML5
   const videoElement = document.querySelector('#meuVideo');
   
-  // Variáveis
-  let audioUnlocked = false;
-  let audioPausedTime = 0;
-  let isAudioPlaying = false;
+  // Variáveis de controle
+  let videoUnlocked = false;
   let videoPausedTime = 0;
   let isVideoPlaying = false;
-  let currentTarget = null;
+  let firstTargetFound = false;
   
-  // Botão
+  // Criar botão de controle simplificado
   const audioBtn = document.createElement('button');
   audioBtn.id = 'audioControlBtn';
   audioBtn.className = 'audio-control-btn paused';
-  audioBtn.innerHTML = '🔇';
+  audioBtn.innerHTML = '🔇'; // Ícone de mudo
   document.body.appendChild(audioBtn);
 
+  // Função para atualizar o ícone do botão
   function updateButtonIcon() {
-    if (isAudioPlaying || isVideoPlaying) {
-      audioBtn.innerHTML = '🔊';
+    if (isVideoPlaying) {
+      audioBtn.innerHTML = '🔊'; // Ícone de som alto
       audioBtn.classList.add('playing');
       audioBtn.classList.remove('paused');
     } else {
-      audioBtn.innerHTML = '🔇';
+      audioBtn.innerHTML = '🔇'; // Ícone de mudo
       audioBtn.classList.add('paused');
       audioBtn.classList.remove('playing');
     }
   }
 
-  // ============================================
-  // TARGET 0 - MODELO
-  // ============================================
-  targetModelo.addEventListener("targetFound", () => {
-    console.log('TARGET 0 encontrado! (Modelo)');
-    currentTarget = 'modelo';
-    
-    // Pausa vídeo se estiver tocando
-    if (isVideoPlaying) {
-      videoPausedTime = videoElement.currentTime;
-      videoElement.pause();
-      isVideoPlaying = false;
-    }
-    
-    // Toca áudio do modelo
-    if (!audioUnlocked) {
-      audioElement.play()
-        .then(() => {
-          audioUnlocked = true;
-          isAudioPlaying = true;
-          updateButtonIcon();
-        })
-        .catch(() => {});
-    } else {
-      if (audioPausedTime > 0) audioElement.currentTime = audioPausedTime;
-      audioElement.play().then(() => {
-        isAudioPlaying = true;
-        updateButtonIcon();
-      });
-    }
-  });
-
-  targetModelo.addEventListener("targetLost", () => {
-    console.log('TARGET 0 perdido!');
-    if (isAudioPlaying) {
-      audioPausedTime = audioElement.currentTime;
-      audioElement.pause();
-      isAudioPlaying = false;
-      updateButtonIcon();
-    }
-  });
-
-  // ============================================
-  // TARGET 1 - VÍDEO
-  // ============================================
-  targetVideo.addEventListener("targetFound", () => {
-    console.log('TARGET 1 encontrado! (Vídeo)');
-    currentTarget = 'video';
-    
-    // Pausa áudio se estiver tocando
-    if (isAudioPlaying) {
-      audioPausedTime = audioElement.currentTime;
-      audioElement.pause();
-      isAudioPlaying = false;
-    }
-    
-    // Toca vídeo
+  // Função para tentar tocar vídeo
+  function tryPlayVideo() {
     if (!videoUnlocked) {
+      // Tenta desbloquear e tocar
       videoElement.play()
         .then(() => {
           videoUnlocked = true;
           isVideoPlaying = true;
+          console.log('Vídeo desbloqueado e tocando!');
           updateButtonIcon();
         })
-        .catch(() => {});
-    } else {
-      if (videoPausedTime > 0) videoElement.currentTime = videoPausedTime;
-      videoElement.play().then(() => {
-        isVideoPlaying = true;
-        updateButtonIcon();
-      });
+        .catch(error => {
+          console.log('Não foi possível tocar vídeo automaticamente:', error);
+          videoUnlocked = false;
+        });
+    } else if (!isVideoPlaying) {
+      // Se já está desbloqueado mas pausado, toca de onde parou
+      if (videoPausedTime > 0) {
+        videoElement.currentTime = videoPausedTime;
+      }
+      
+      videoElement.play()
+        .then(() => {
+          isVideoPlaying = true;
+          console.log('Vídeo tocando, tempo:', videoElement.currentTime);
+          updateButtonIcon();
+        })
+        .catch(error => {
+          console.error('Erro ao tocar vídeo:', error);
+        });
     }
-  });
+  }
 
-  targetVideo.addEventListener("targetLost", () => {
-    console.log('TARGET 1 perdido!');
+  // Função para pausar vídeo
+  function pauseVideo() {
     if (isVideoPlaying) {
       videoPausedTime = videoElement.currentTime;
       videoElement.pause();
       isVideoPlaying = false;
+      console.log('Vídeo pausado no tempo:', videoPausedTime);
       updateButtonIcon();
     }
+  }
+
+  // ▶ Quando reconhecer o target
+  target.addEventListener("targetFound", () => {
+    console.log('Target encontrado!');
+    
+    firstTargetFound = true;
+    
+    // Tenta tocar o vídeo automaticamente
+    tryPlayVideo();
   });
 
-  // Botão manual
+  // ⏹ Quando perder o target
+  target.addEventListener("targetLost", () => {
+    console.log('Target perdido!');
+    pauseVideo();
+  });
+
+  // Botão para controle manual (toggle)
   audioBtn.addEventListener('click', function() {
-    if (isAudioPlaying) {
-      audioPausedTime = audioElement.currentTime;
-      audioElement.pause();
-      isAudioPlaying = false;
-    } else if (isVideoPlaying) {
-      videoPausedTime = videoElement.currentTime;
-      videoElement.pause();
-      isVideoPlaying = false;
+    if (isVideoPlaying) {
+      pauseVideo();
     } else {
-      if (currentTarget === 'modelo') {
-        if (audioPausedTime > 0) audioElement.currentTime = audioPausedTime;
-        audioElement.play().then(() => isAudioPlaying = true);
-      } else if (currentTarget === 'video') {
-        if (videoPausedTime > 0) videoElement.currentTime = videoPausedTime;
-        videoElement.play().then(() => isVideoPlaying = true);
-      }
+      tryPlayVideo();
     }
-    updateButtonIcon();
   });
 
-  // Monitorar tempos
+  // Monitorar o tempo do vídeo
   setInterval(() => {
-    if (isAudioPlaying) audioPausedTime = audioElement.currentTime;
-    if (isVideoPlaying) videoPausedTime = videoElement.currentTime;
+    if (isVideoPlaying) {
+      videoPausedTime = videoElement.currentTime;
+    }
   }, 1000);
 
-  // Desbloqueio
-  document.body.addEventListener('click', function unlock() {
-    audioElement.play().then(() => { audioElement.pause(); audioElement.currentTime = 0; }).catch(() => {});
-    videoElement.play().then(() => { videoElement.pause(); videoElement.currentTime = 0; }).catch(() => {});
-    document.body.removeEventListener('click', unlock);
+  // Quando o vídeo terminar, resetar
+  videoElement.addEventListener('ended', function() {
+    isVideoPlaying = false;
+    videoPausedTime = 0;
+    updateButtonIcon();
+    console.log('Vídeo terminou');
   });
 
-  audioElement.load();
-  videoElement.load();
+  // Também tenta tocar quando qualquer interação ocorrer na tela
+  document.body.addEventListener('click', function() {
+    if (firstTargetFound && !videoUnlocked) {
+      tryPlayVideo();
+    }
+  });
+  
+  document.body.addEventListener('touchstart', function() {
+    if (firstTargetFound && !videoUnlocked) {
+      tryPlayVideo();
+    }
+  });
 
-  console.log('✅ Sistema pronto!');
-  console.log('🎯 Target 0: Modelo 3D');
-  console.log('🎯 Target 1: Vídeo');
+  // Pré-carrega o vídeo
+  videoElement.load();
 
 });
 </script>
