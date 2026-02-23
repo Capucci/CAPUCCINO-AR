@@ -3,16 +3,12 @@
 <head>
    <script>
 const VERSION = "1.9.0"; 
-// ↑ SEMPRE que atualizar modelo/vídeo ou target,
-// só mude esse número
+// ↑ SEMPRE que atualizar vídeo ou target, mude esse número
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-
-<!-- NECESSÁRIO PARA ANIMAÇÃO -->
 <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
 <style>
@@ -45,36 +41,21 @@ body { margin:0; overflow:hidden; }
 
   <a-entity mindar-image-target="targetIndex: 0" id="target-principal">
 
-    <!-- GRUPO PARA CONTROLAR TUDO JUNTO (opcional) -->
-    <a-entity id="grupo-principal" position="0 0 0.3">
-
-      <!-- MODELO 3D - Corrigido -->
-      <a-entity
-        id="mascote"
-        gltf-model="Modelo.glb"
-        animation-mixer
-        position="-0.8 0 0"
-        rotation="0 0 0"  <!-- Ajuste conforme necessário -->
-        scale="0.7 0.7 0.7">
-      </a-entity>
-
-      <!-- VÍDEO - Corrigido (rotação para ficar na horizontal) -->
-      <a-video
-        id="video-mascote"
-        src="#meuVideo"
-        position="0 0 0"
-        rotation="0 0 0"  <!-- 0 0 0 = plano horizontal -->
-        width="1.2"
-        height="0.8"
-        material="side: double;"> <!-- Para ver de ambos os lados -->
-      </a-video>
-
-    </a-entity>
+    <!-- VÍDEO CENTRALIZADO NO TARGET -->
+    <a-video
+      id="video-principal"
+      src="#meuVideo"
+      position="0 0 0.1"
+      rotation="0 0 0"
+      width="1.5"
+      height="0.85"
+      material="side: double;">
+    </a-video>
 
   </a-entity>
 
   <!-- Elemento de vídeo HTML5 escondido (com áudio incluso) -->
-  <video id="meuVideo" preload="auto" loop="false" crossorigin="anonymous" style="display: none;" muted>
+  <video id="meuVideo" preload="auto" loop="false" crossorigin="anonymous" style="display: none;">
     <source src="Video Antecipe Portugues 1.mp4" type="video/mp4">
   </video>
 
@@ -83,76 +64,98 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const target = document.querySelector('#target-principal');
   const videoElement = document.querySelector('#meuVideo');
-  const modeloElement = document.querySelector('#mascote');
-  const videoAFrame = document.querySelector('#video-mascote');
   
   let videoUnlocked = false;
+  let videoPausedTime = 0;
+  let isVideoPlaying = false;
   let firstTargetFound = false;
 
-  // ▶ Quando reconhecer o target
-  target.addEventListener("targetFound", () => {
-    console.log('Target encontrado!');
-    firstTargetFound = true;
-    
-    // Tenta tocar o vídeo automaticamente
+  // Função para tocar o vídeo
+  function playVideo() {
     if (!videoUnlocked) {
       videoElement.play()
         .then(() => {
           videoUnlocked = true;
+          isVideoPlaying = true;
           console.log('Vídeo tocando!');
         })
         .catch(error => {
           console.log('Erro ao tocar vídeo:', error);
         });
+    } else if (!isVideoPlaying) {
+      if (videoPausedTime > 0) {
+        videoElement.currentTime = videoPausedTime;
+      }
+      videoElement.play()
+        .then(() => {
+          isVideoPlaying = true;
+          console.log('Vídeo retomado!');
+        })
+        .catch(error => {
+          console.error('Erro ao retomar vídeo:', error);
+        });
     }
+  }
+
+  // Função para pausar o vídeo
+  function pauseVideo() {
+    if (isVideoPlaying) {
+      videoPausedTime = videoElement.currentTime;
+      videoElement.pause();
+      isVideoPlaying = false;
+      console.log('Vídeo pausado no tempo:', videoPausedTime);
+    }
+  }
+
+  // ▶ Quando reconhecer o target
+  target.addEventListener("targetFound", () => {
+    console.log('Target encontrado!');
+    firstTargetFound = true;
+    playVideo();
   });
 
   // ⏹ Quando perder o target
   target.addEventListener("targetLost", () => {
     console.log('Target perdido!');
-    if (videoUnlocked) {
-      videoElement.pause();
-    }
+    pauseVideo();
   });
 
-  // Se quiser que o vídeo recomece quando o target for encontrado novamente
-  target.addEventListener("targetFound", () => {
-    if (videoUnlocked) {
-      videoElement.currentTime = 0;
-      videoElement.play();
-    }
+  // Quando o vídeo terminar
+  videoElement.addEventListener('ended', function() {
+    isVideoPlaying = false;
+    videoPausedTime = 0;
+    console.log('Vídeo terminou');
   });
+
+  // Desbloqueio por interação do usuário (necessário para browsers)
+  function unlockVideo() {
+    if (firstTargetFound && !videoUnlocked) {
+      videoElement.play()
+        .then(() => {
+          videoUnlocked = true;
+          isVideoPlaying = true;
+          console.log('Vídeo desbloqueado por interação!');
+        })
+        .catch(e => console.log('Aguardando interação...'));
+    }
+  }
+
+  // Eventos para desbloquear (sem botão visível)
+  document.body.addEventListener('click', unlockVideo);
+  document.body.addEventListener('touchstart', unlockVideo);
+
+  // Monitorar o tempo do vídeo
+  setInterval(() => {
+    if (isVideoPlaying) {
+      videoPausedTime = videoElement.currentTime;
+    }
+  }, 1000);
 
   // Pré-carrega o vídeo
   videoElement.load();
-
-  // Configuração adicional para garantir que o vídeo não mude
-  // Tenta tocar quando qualquer interação ocorrer na tela (para desbloquear)
-  document.body.addEventListener('click', function() {
-    if (firstTargetFound && !videoUnlocked) {
-      videoElement.play()
-        .then(() => {
-          videoUnlocked = true;
-        })
-        .catch(e => console.log('Aguardando interação...'));
-    }
-  });
-  
-  document.body.addEventListener('touchstart', function() {
-    if (firstTargetFound && !videoUnlocked) {
-      videoElement.play()
-        .then(() => {
-          videoUnlocked = true;
-        })
-        .catch(e => console.log('Aguardando interação...'));
-    }
-  });
 
 });
 </script>
 
 </body>
 </html>
-
-
-
