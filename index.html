@@ -2,73 +2,105 @@
 <html>
 <head>
    <script>
-const VERSION = "1.9.0"; 
+const VERSION = "1.9.1"; 
 // ↑ SEMPRE que atualizar vídeo ou target, mude esse número
 </script>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
 <style>
-body { margin:0; overflow:hidden; }
-
-/* Botão de VR no canto inferior direito */
-.a-enter-vr {
-  position: fixed;
-  bottom: 20px !important;
-  right: 20px !important;
-  left: auto !important;
-  top: auto !important;
-  transform: none !important;
-}
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: transparent;
+  }
+  
+  body {
+    background-color: transparent;
+  }
+  
+  /* Remove qualquer fundo branco */
+  .a-scene, .a-canvas, canvas {
+    background-color: transparent !important;
+  }
+  
+  /* Esconde qualquer elemento de carregamento ou mensagem */
+  .a-loader-title, .rs-base, .mind-ar-overlay {
+    display: none !important;
+  }
+  
+  /* Garante que a câmera ocupe a tela toda */
+  .a-enter-vr {
+    position: fixed;
+    bottom: 20px !important;
+    right: 20px !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    z-index: 999;
+  }
 </style>
 
 </head>
 
-<body>
+<body style="background-color: transparent; margin: 0; padding: 0; overflow: hidden;">
 
 <a-scene
   mindar-image="imageTargetSrc: Target01.mind;"
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false"
+  background="transparent"
   embedded
-  renderer="colorManagement: true;"
-  background="color: black">
+  style="width: 100%; height: 100%; background-color: transparent; position: fixed; top: 0; left: 0;">
 
   <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
   <a-entity mindar-image-target="targetIndex: 0" id="target-principal">
 
-    <!-- VÍDEO CENTRALIZADO NO TARGET -->
+    <!-- VÍDEO CENTRALIZADO COM CORREÇÃO DE ROTAÇÃO -->
     <a-video
       id="video-principal"
       src="#meuVideo"
       position="0 0 0.1"
-      rotation="0 0 0"
+      rotation="-90 0 0"
       width="1.5"
       height="0.85"
-      material="side: double;">
+      material="transparent: false; side: double;">
     </a-video>
 
   </a-entity>
 
-  <!-- Elemento de vídeo HTML5 escondido (com áudio incluso) -->
-  <video id="meuVideo" preload="auto" loop="false" crossorigin="anonymous" style="display: none;">
+  <!-- Elemento de vídeo HTML5 escondido -->
+  <video id="meuVideo" preload="auto" loop="false" crossorigin="anonymous" style="display: none;" muted="false">
     <source src="Video Antecipe Portugues 1.mp4" type="video/mp4">
   </video>
+
+  <!-- Overlay invisível para capturar toques e desbloquear áudio -->
+  <div id="unlock-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000; background: transparent; pointer-events: auto;"></div>
 
   <script>
 document.addEventListener("DOMContentLoaded", function () {
 
   const target = document.querySelector('#target-principal');
   const videoElement = document.querySelector('#meuVideo');
+  const videoAFrame = document.querySelector('#video-principal');
+  const unlockOverlay = document.getElementById('unlock-overlay');
   
   let videoUnlocked = false;
   let videoPausedTime = 0;
   let isVideoPlaying = false;
   let firstTargetFound = false;
+
+  // Força o vídeo a mostrar imagem
+  videoElement.addEventListener('loadeddata', function() {
+    console.log('Vídeo carregado, dimensões:', videoElement.videoWidth, 'x', videoElement.videoHeight);
+  });
 
   // Função para tocar o vídeo
   function playVideo() {
@@ -78,6 +110,11 @@ document.addEventListener("DOMContentLoaded", function () {
           videoUnlocked = true;
           isVideoPlaying = true;
           console.log('Vídeo tocando!');
+          
+          // Remove o overlay após desbloquear
+          if (unlockOverlay) {
+            unlockOverlay.style.display = 'none';
+          }
         })
         .catch(error => {
           console.log('Erro ao tocar vídeo:', error);
@@ -125,24 +162,40 @@ document.addEventListener("DOMContentLoaded", function () {
     isVideoPlaying = false;
     videoPausedTime = 0;
     console.log('Vídeo terminou');
+    
+    // Se quiser que repita, descomente a linha abaixo:
+    // videoElement.currentTime = 0;
   });
 
-  // Desbloqueio por interação do usuário (necessário para browsers)
-  function unlockVideo() {
-    if (firstTargetFound && !videoUnlocked) {
-      videoElement.play()
-        .then(() => {
-          videoUnlocked = true;
-          isVideoPlaying = true;
-          console.log('Vídeo desbloqueado por interação!');
-        })
-        .catch(e => console.log('Aguardando interação...'));
-    }
+  // Overlay de toque para desbloquear áudio
+  if (unlockOverlay) {
+    unlockOverlay.addEventListener('click', function() {
+      if (firstTargetFound && !videoUnlocked) {
+        videoElement.play()
+          .then(() => {
+            videoUnlocked = true;
+            isVideoPlaying = true;
+            console.log('Vídeo desbloqueado por overlay!');
+            unlockOverlay.style.display = 'none';
+          })
+          .catch(e => console.log('Aguardando interação...'));
+      }
+    });
+    
+    unlockOverlay.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      if (firstTargetFound && !videoUnlocked) {
+        videoElement.play()
+          .then(() => {
+            videoUnlocked = true;
+            isVideoPlaying = true;
+            console.log('Vídeo desbloqueado por overlay touch!');
+            unlockOverlay.style.display = 'none';
+          })
+          .catch(e => console.log('Aguardando interação...'));
+      }
+    });
   }
-
-  // Eventos para desbloquear (sem botão visível)
-  document.body.addEventListener('click', unlockVideo);
-  document.body.addEventListener('touchstart', unlockVideo);
 
   // Monitorar o tempo do vídeo
   setInterval(() => {
@@ -153,6 +206,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Pré-carrega o vídeo
   videoElement.load();
+
+  // Log para debug
+  console.log('Script carregado, aguardando target...');
 
 });
 </script>
