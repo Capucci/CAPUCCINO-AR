@@ -2,161 +2,166 @@
 <html>
 <head>
    <script>
-const VERSION = "1.9.4"; 
+const VERSION = "1.9.5"; 
 </script>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AR Video Test</title>
-  
-  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: black;
-      position: fixed;
-      top: 0;
-      left: 0;
-    }
-    
-    /* Garante que a câmera apareça em tela cheia */
-    a-scene, .a-canvas, canvas {
-      width: 100% !important;
-      height: 100% !important;
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      background: transparent !important;
-      display: block !important;
-    }
-    
-    /* Remove qualquer elemento branco */
-    .a-loader-title, .mind-ar-overlay, .rs-base {
-      display: none !important;
-    }
-    
-    /* Botão VR no lugar certo */
-    .a-enter-vr {
-      position: fixed !important;
-      bottom: 20px !important;
-      right: 20px !important;
-      left: auto !important;
-      top: auto !important;
-      z-index: 9999 !important;
-    }
-  </style>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+}
+</style>
+
 </head>
+
 <body>
 
-<!-- CENA SIMPLES E DIRETA -->
-<a-scene 
-  mindar-image="imageTargetSrc: Target01.mind; autoStart: true;"
-  color-space="sRGB"
-  embedded
-  renderer="colorManagement: true;"
+<a-scene
+  mindar-image="imageTargetSrc: Target01.mind;"
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false"
-  background="transparent"
-  style="width:100%; height:100%; background:transparent;">
+  embedded
+  color-space="sRGB"
+  renderer="colorManagement: true, physicallyCorrectLights">
 
-  <!-- CÂMERA - ESSENCIAL -->
-  <a-camera id="camera" position="0 0 0" look-controls="enabled: false"></a-camera>
-  
-  <!-- TARGET -->
-  <a-entity mindar-image-target="targetIndex: 0">
+  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <!-- VÍDEO - TESTE AS ROTAÇÕES AQUI -->
+  <!-- =============================== -->
+  <!-- 🎯 TARGET 0 - MODELO + MÚSICA -->
+  <!-- =============================== -->
+  <a-entity mindar-image-target="targetIndex: 0" id="target-mascote">
+
+    <a-entity
+      id="modelo3d"
+      gltf-model="Cena 01Teste.glb"
+      animation-mixer
+      position="0 0 0.3"
+      rotation="-90 0 0"
+      scale="0.7 0.7 0.7">
+    </a-entity>
+
+  </a-entity>
+
+
+  <!-- =============================== -->
+  <!-- 🎯 TARGET 1 - VÍDEO COM ÁUDIO -->
+  <!-- =============================== -->
+  <a-entity mindar-image-target="targetIndex: 1" id="target-video">
+
     <a-video
-      src="#meuVideo"
-      position="0 0 0.2"
-      rotation="0 0 0"
-      width="1.5"
-      height="0.85"
-      material="transparent: false; side: double;">
+      src="#videoSource"
+      width="1"
+      height="0.6"
+      position="0 0 0"
+      rotation="0 0 0">
     </a-video>
 
   </a-entity>
-  
+
+
+  <!-- 🎵 Áudio Mascote -->
+  <audio id="audioMascote" preload="auto">
+    <source src="AudioTrack11.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- 🎬 Vídeo -->
+  <video
+    id="videoSource"
+    src="Video Antecipe Portugues 1.mp4"
+    preload="auto"
+    webkit-playsinline
+    playsinline
+    crossorigin="anonymous">
+  </video>
+
 </a-scene>
 
-<!-- VÍDEO ESCONDIDO -->
-<video id="meuVideo" preload="auto" loop="false" playsinline webkit-playsinline style="display: none;">
-  <source src="Video Antecipe Portugues 1.mp4" type="video/mp4">
-</video>
 
 <script>
-// Script mínimo e funcional
-document.addEventListener("DOMContentLoaded", function() {
-  
-  const video = document.getElementById('meuVideo');
-  const target = document.querySelector('a-entity[mindar-image-target]');
-  
-  let isPlaying = false;
-  let currentTime = 0;
-  
-  // Configurações de áudio
-  video.muted = false;
-  video.volume = 1.0;
-  
-  // Quando achar o target
-  target.addEventListener("targetFound", () => {
-    console.log("✅ TARGET ENCONTRADO");
-    
-    if (currentTime > 0) {
-      video.currentTime = currentTime;
+document.addEventListener("DOMContentLoaded", function () {
+
+  const targetMascote = document.querySelector('#target-mascote');
+  const targetVideo = document.querySelector('#target-video');
+
+  const audioMascote = document.querySelector('#audioMascote');
+  const video = document.querySelector('#videoSource');
+
+  let audioTime = 0;
+  let videoTime = 0;
+
+  let audioUnlocked = false;
+  let videoUnlocked = false;
+
+  /* ============================= */
+  /* 🔓 DESBLOQUEIO PARA MOBILE   */
+  /* ============================= */
+
+  document.body.addEventListener("click", unlockMedia);
+  document.body.addEventListener("touchstart", unlockMedia);
+
+  function unlockMedia() {
+
+    if (!audioUnlocked) {
+      audioMascote.play().then(() => {
+        audioMascote.pause();
+        audioUnlocked = true;
+      }).catch(() => {});
     }
-    
-    // Tenta tocar o vídeo
-    const playPromise = video.play();
-    
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          isPlaying = true;
-          console.log("🎬 VÍDEO TOCANDO");
-        })
-        .catch(err => {
-          console.log("⚠️ Precisa de interação:", err);
-          // Se falhar, aguarda um clique
-          document.body.addEventListener('click', function once() {
-            video.play();
-            document.body.removeEventListener('click', once);
-          });
-        });
+
+    if (!videoUnlocked) {
+      video.play().then(() => {
+        video.pause();
+        videoUnlocked = true;
+      }).catch(() => {});
     }
+  }
+
+  /* ============================= */
+  /* 🎵 TARGET 0 - MASCOTE        */
+  /* ============================= */
+
+  targetMascote.addEventListener("targetFound", () => {
+    audioMascote.currentTime = audioTime;
+    audioMascote.play();
   });
-  
-  // Quando perder o target
-  target.addEventListener("targetLost", () => {
-    console.log("❌ TARGET PERDIDO");
-    if (isPlaying) {
-      currentTime = video.currentTime;
-      video.pause();
-      isPlaying = false;
-    }
+
+  targetMascote.addEventListener("targetLost", () => {
+    audioTime = audioMascote.currentTime;
+    audioMascote.pause();
   });
-  
-  // Quando o vídeo acabar
-  video.addEventListener('ended', () => {
-    console.log("🏁 VÍDEO FINALIZADO");
-    isPlaying = false;
-    currentTime = 0;
+
+  /* ============================= */
+  /* 🎬 TARGET 1 - VÍDEO          */
+  /* ============================= */
+
+  targetVideo.addEventListener("targetFound", () => {
+    video.currentTime = videoTime;
+    video.play();
   });
-  
-  // Carrega o vídeo
-  video.load();
-  
-  console.log("🚀 App AR iniciado");
-  
+
+  targetVideo.addEventListener("targetLost", () => {
+    videoTime = video.currentTime;
+    video.pause();
+  });
+
+  /* ============================= */
+  /* 🔁 RESET AUTOMÁTICO AO FINAL */
+  /* ============================= */
+
+  audioMascote.addEventListener("ended", () => {
+    audioTime = 0;
+  });
+
+  video.addEventListener("ended", () => {
+    videoTime = 0;
+  });
+
 });
 </script>
 
