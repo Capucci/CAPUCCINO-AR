@@ -2,7 +2,7 @@
 <html>
 <head>
    <script>
-const VERSION = "1.1.0"; 
+const VERSION = "1.2.0"; 
 // ↑ SEMPRE que atualizar modelo/vídeo ou target,
 // só mude esse número
 </script>
@@ -17,38 +17,6 @@ const VERSION = "1.1.0";
 
 <style>
 body { margin:0; overflow:hidden; }
-
-/* Botão simplificado no canto inferior esquerdo */
-.audio-control-btn {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  z-index: 9999;
-  cursor: pointer;
-  border: 2px solid white;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  transition: all 0.3s ease;
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
-.audio-control-btn.playing {
-  background-color: rgba(0, 128, 0, 0.8);
-}
-
-.audio-control-btn.paused {
-  background-color: rgba(255, 0, 0, 0.8);
-}
-
-.audio-control-btn:hover {
-  transform: scale(1.1);
-}
 
 /* Botão de VR no canto inferior direito */
 .a-enter-vr {
@@ -66,180 +34,122 @@ body { margin:0; overflow:hidden; }
 <body>
 
 <a-scene
-  mindar-image="imageTargetSrc: Target01.mind;"
+  mindar-image="imageTargetSrc: Target00.mind;"
   vr-mode-ui="enabled: false"
-  device-orientation-permission-ui="enabled: false">
+  device-orientation-permission-ui="enabled: false"
+  embedded
+  renderer="colorManagement: true;"
+  background="color: black">
 
   <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
   <a-entity mindar-image-target="targetIndex: 0" id="target-principal">
 
-    <!-- MODELO 3D (lado esquerdo) -->
-    <a-entity
-      id="mascote"
-      gltf-model="Cena 01Teste.glb"
-      animation-mixer
-      position="-0.8 0 0.3"
-      rotation="0 0 0"
-      scale="0.7 0.7 0.7">
-    </a-entity>
+    <!-- GRUPO PARA CONTROLAR TUDO JUNTO (opcional) -->
+    <a-entity id="grupo-principal" position="0 0 0.3">
 
-    <!-- VÍDEO (lado direito) -->
-    <a-video
-      id="video-mascote"
-      src="Video Antecipe Portugues 1.mp4"
-      position="0.8 0 0.3"
-      rotation="0 0 0"
-      width="1.2"
-      height="0.8">
-    </a-video>
+      <!-- MODELO 3D - Corrigido -->
+      <a-entity
+        id="mascote"
+        gltf-model="MascoteDanca.glb"
+        animation-mixer
+        position="-0.8 0 0"
+        rotation="0 0 0"  <!-- Ajuste conforme necessário -->
+        scale="0.7 0.7 0.7">
+      </a-entity>
+
+      <!-- VÍDEO - Corrigido (rotação para ficar na horizontal) -->
+      <a-video
+        id="video-mascote"
+        src="Video Antecipe Portugues 1.mp4"
+        position="0.8 0 0"
+        rotation="0 0 0"  <!-- 0 0 0 = plano horizontal -->
+        width="1.2"
+        height="0.8"
+        material="side: double;"> <!-- Para ver de ambos os lados -->
+      </a-video>
+
+    </a-entity>
 
   </a-entity>
 
   <!-- Elemento de vídeo HTML5 escondido (com áudio incluso) -->
-  <video id="meuVideo" preload="auto" loop="false" crossorigin="anonymous" style="display: none;">
+  <video id="meuVideo" preload="auto" loop="false" crossorigin="anonymous" style="display: none;" muted>
     <source src="SeuVideo.mp4" type="video/mp4">
-    <!-- Substitua "SeuVideo.mp4" pelo caminho correto do seu arquivo de vídeo -->
   </video>
 
   <script>
 document.addEventListener("DOMContentLoaded", function () {
 
   const target = document.querySelector('#target-principal');
-  
-  // Referência direta ao elemento de vídeo HTML5
   const videoElement = document.querySelector('#meuVideo');
+  const modeloElement = document.querySelector('#mascote');
+  const videoAFrame = document.querySelector('#video-mascote');
   
-  // Variáveis de controle
   let videoUnlocked = false;
-  let videoPausedTime = 0;
-  let isVideoPlaying = false;
   let firstTargetFound = false;
-  
-  // Criar botão de controle simplificado
-  const audioBtn = document.createElement('button');
-  audioBtn.id = 'audioControlBtn';
-  audioBtn.className = 'audio-control-btn paused';
-  audioBtn.innerHTML = '🔇'; // Ícone de mudo
-  document.body.appendChild(audioBtn);
-
-  // Função para atualizar o ícone do botão
-  function updateButtonIcon() {
-    if (isVideoPlaying) {
-      audioBtn.innerHTML = '🔊'; // Ícone de som alto
-      audioBtn.classList.add('playing');
-      audioBtn.classList.remove('paused');
-    } else {
-      audioBtn.innerHTML = '🔇'; // Ícone de mudo
-      audioBtn.classList.add('paused');
-      audioBtn.classList.remove('playing');
-    }
-  }
-
-  // Função para tentar tocar vídeo
-  function tryPlayVideo() {
-    if (!videoUnlocked) {
-      // Tenta desbloquear e tocar
-      videoElement.play()
-        .then(() => {
-          videoUnlocked = true;
-          isVideoPlaying = true;
-          console.log('Vídeo desbloqueado e tocando!');
-          updateButtonIcon();
-        })
-        .catch(error => {
-          console.log('Não foi possível tocar vídeo automaticamente:', error);
-          videoUnlocked = false;
-        });
-    } else if (!isVideoPlaying) {
-      // Se já está desbloqueado mas pausado, toca de onde parou
-      if (videoPausedTime > 0) {
-        videoElement.currentTime = videoPausedTime;
-      }
-      
-      videoElement.play()
-        .then(() => {
-          isVideoPlaying = true;
-          console.log('Vídeo tocando, tempo:', videoElement.currentTime);
-          updateButtonIcon();
-        })
-        .catch(error => {
-          console.error('Erro ao tocar vídeo:', error);
-        });
-    }
-  }
-
-  // Função para pausar vídeo
-  function pauseVideo() {
-    if (isVideoPlaying) {
-      videoPausedTime = videoElement.currentTime;
-      videoElement.pause();
-      isVideoPlaying = false;
-      console.log('Vídeo pausado no tempo:', videoPausedTime);
-      updateButtonIcon();
-    }
-  }
 
   // ▶ Quando reconhecer o target
   target.addEventListener("targetFound", () => {
     console.log('Target encontrado!');
-    
     firstTargetFound = true;
     
     // Tenta tocar o vídeo automaticamente
-    tryPlayVideo();
+    if (!videoUnlocked) {
+      videoElement.play()
+        .then(() => {
+          videoUnlocked = true;
+          console.log('Vídeo tocando!');
+        })
+        .catch(error => {
+          console.log('Erro ao tocar vídeo:', error);
+        });
+    }
   });
 
   // ⏹ Quando perder o target
   target.addEventListener("targetLost", () => {
     console.log('Target perdido!');
-    pauseVideo();
-  });
-
-  // Botão para controle manual (toggle)
-  audioBtn.addEventListener('click', function() {
-    if (isVideoPlaying) {
-      pauseVideo();
-    } else {
-      tryPlayVideo();
+    if (videoUnlocked) {
+      videoElement.pause();
     }
   });
 
-  // Monitorar o tempo do vídeo
-  setInterval(() => {
-    if (isVideoPlaying) {
-      videoPausedTime = videoElement.currentTime;
-    }
-  }, 1000);
-
-  // Quando o vídeo terminar, resetar
-  videoElement.addEventListener('ended', function() {
-    isVideoPlaying = false;
-    videoPausedTime = 0;
-    updateButtonIcon();
-    console.log('Vídeo terminou');
-  });
-
-  // Também tenta tocar quando qualquer interação ocorrer na tela
-  document.body.addEventListener('click', function() {
-    if (firstTargetFound && !videoUnlocked) {
-      tryPlayVideo();
-    }
-  });
-  
-  document.body.addEventListener('touchstart', function() {
-    if (firstTargetFound && !videoUnlocked) {
-      tryPlayVideo();
+  // Se quiser que o vídeo recomece quando o target for encontrado novamente
+  target.addEventListener("targetFound", () => {
+    if (videoUnlocked) {
+      videoElement.currentTime = 0;
+      videoElement.play();
     }
   });
 
   // Pré-carrega o vídeo
   videoElement.load();
 
+  // Configuração adicional para garantir que o vídeo não mude
+  // Tenta tocar quando qualquer interação ocorrer na tela (para desbloquear)
+  document.body.addEventListener('click', function() {
+    if (firstTargetFound && !videoUnlocked) {
+      videoElement.play()
+        .then(() => {
+          videoUnlocked = true;
+        })
+        .catch(e => console.log('Aguardando interação...'));
+    }
+  });
+  
+  document.body.addEventListener('touchstart', function() {
+    if (firstTargetFound && !videoUnlocked) {
+      videoElement.play()
+        .then(() => {
+          videoUnlocked = true;
+        })
+        .catch(e => console.log('Aguardando interação...'));
+    }
+  });
+
 });
 </script>
 
 </body>
 </html>
-
-
